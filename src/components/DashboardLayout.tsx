@@ -16,6 +16,7 @@ import {
   LogOut,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import VoiceAssistantFAB from "@/components/VoiceAssistantFAB";
 import kalaLogo from "@/assets/kala-logo.png";
 
 const navItems = [
