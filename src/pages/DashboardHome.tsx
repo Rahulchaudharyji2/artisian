@@ -4,6 +4,7 @@ import { Upload, Package, BookOpen, Share2, Globe, TrendingUp, ArrowRight } from
 import { Link } from "react-router-dom";
 import DashboardLayout from "@/components/DashboardLayout";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 
 const quickActions = [
   { icon: Upload, label: "Upload Product", desc: "Create AI listing from photo", path: "/dashboard/upload", color: "gradient-hero" },
@@ -21,19 +22,25 @@ const fadeUp = {
 };
 
 const DashboardHome = () => {
+  const { user } = useAuth();
   const [productCount, setProductCount] = useState(0);
   const [listingCount, setListingCount] = useState(0);
   const [categoryCount, setCategoryCount] = useState(0);
-  const [priceCount, setPriceCount] = useState(0);
+  const [artisanName, setArtisanName] = useState("");
 
   useEffect(() => {
+    if (!user) return;
+    // Fetch profile name
+    supabase.from("profiles").select("name").eq("id", user.id).single().then(({ data }) => {
+      if (data?.name) setArtisanName(data.name);
+    });
+
     const fetchStats = async () => {
-      const { data: products } = await supabase.from("products").select("id, description, category, price");
+      const { data: products } = await supabase.from("products").select("id, description, category");
       if (products) {
         setProductCount(products.length);
         setListingCount(products.filter(p => p.description && p.description.length > 50).length);
         setCategoryCount(new Set(products.map(p => p.category)).size);
-        setPriceCount(products.filter(p => p.price && parseFloat(p.price) > 0).length);
       }
     };
     fetchStats();
@@ -44,7 +51,7 @@ const DashboardHome = () => {
       .subscribe();
 
     return () => { supabase.removeChannel(channel); };
-  }, []);
+  }, [user]);
 
   const stats = [
     { label: "Products", value: productCount.toString(), icon: Package },
@@ -58,7 +65,7 @@ const DashboardHome = () => {
         {/* Welcome */}
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
           <h1 className="text-2xl md:text-3xl font-display font-bold text-foreground">
-            Welcome, Artisan! 🎨
+            Welcome{artisanName ? `, ${artisanName}` : ", Artisan"}! 🎨
           </h1>
           <p className="text-muted-foreground mt-1">
             Your AI-powered digital manager is ready to help.
