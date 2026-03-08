@@ -74,6 +74,7 @@ const MyProductsPage = () => {
                   ))}
                 </div>
               </div>
+              </div>
             ))}
           </div>
         )}

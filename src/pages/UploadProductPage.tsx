@@ -239,22 +239,22 @@ const UploadProductPage = () => {
               <Slider
                 value={[manualPrice]}
                 onValueChange={(v) => setManualPrice(v[0])}
-                min={50}
-                max={50000}
+                min={priceRange.min}
+                max={priceRange.max}
                 step={50}
                 className="w-full"
               />
               <div className="flex justify-between text-xs text-muted-foreground">
-                <span>₹50</span>
-                <span>₹50,000</span>
+                <span>₹{priceRange.min.toLocaleString("en-IN")}</span>
+                <span>₹{priceRange.max.toLocaleString("en-IN")}</span>
               </div>
               <Input
                 type="number"
                 value={manualPrice}
-                onChange={(e) => setManualPrice(Math.max(50, Math.min(50000, Number(e.target.value))))}
+                onChange={(e) => setManualPrice(Math.max(priceRange.min, Math.min(priceRange.max, Number(e.target.value))))}
                 className="w-32"
-                min={50}
-                max={50000}
+                min={priceRange.min}
+                max={priceRange.max}
               />
             </div>
 
