@@ -15,6 +15,8 @@ const UploadProductPage = () => {
   const [publishing, setPublishing] = useState(false);
   const [imageDescription, setImageDescription] = useState("");
   const [manualPrice, setManualPrice] = useState(500);
+  const [priceRange, setPriceRange] = useState<{ min: number; max: number }>({ min: 50, max: 50000 });
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [listing, setListing] = useState<{
     title: string;
     description: string;
@@ -25,6 +27,7 @@ const UploadProductPage = () => {
 
   const handleFile = (file: File) => {
     if (!file.type.startsWith("image/")) return;
+    setSelectedFile(file);
     const reader = new FileReader();
     reader.onload = (e) => setPreview(e.target?.result as string);
     reader.readAsDataURL(file);
@@ -38,12 +41,18 @@ const UploadProductPage = () => {
     if (file) handleFile(file);
   }, []);
 
-  // Parse AI price suggestion to set slider default
-  const parsePrice = (priceStr: string): number => {
+  // Parse AI price suggestion to set slider default and range
+  const parsePrice = (priceStr: string): { mid: number; min: number; max: number } => {
     const matches = priceStr.match(/[\d,]+/g);
-    if (!matches) return 500;
+    if (!matches) return { mid: 500, min: 100, max: 5000 };
     const nums = matches.map((m) => parseInt(m.replace(/,/g, ""), 10));
-    return nums.length >= 2 ? Math.round((nums[0] + nums[1]) / 2) : nums[0];
+    if (nums.length >= 2) {
+      const low = Math.min(nums[0], nums[1]);
+      const high = Math.max(nums[0], nums[1]);
+      const mid = Math.round((low + high) / 2);
+      return { mid, min: Math.max(50, Math.round(low * 0.5)), max: Math.round(high * 2) };
+    }
+    return { mid: nums[0], min: Math.max(50, Math.round(nums[0] * 0.5)), max: Math.round(nums[0] * 3) };
   };
 
   const handleGenerate = async () => {
@@ -59,7 +68,9 @@ const UploadProductPage = () => {
       if (error) throw error;
       if (data.error) throw new Error(data.error);
       setListing(data);
-      setManualPrice(parsePrice(data.price));
+      const parsed = parsePrice(data.price);
+      setManualPrice(parsed.mid);
+      setPriceRange({ min: parsed.min, max: parsed.max });
       toast.success("AI listing generated!");
     } catch (e: any) {
       console.error("Generate listing error:", e);
@@ -73,6 +84,19 @@ const UploadProductPage = () => {
     if (!listing) return;
     setPublishing(true);
     try {
+      let imageUrl: string | null = null;
+      if (selectedFile) {
+        const fileExt = selectedFile.name.split(".").pop();
+        const fileName = `${crypto.randomUUID()}.${fileExt}`;
+        const { error: uploadError } = await supabase.storage
+          .from("product-images")
+          .upload(fileName, selectedFile);
+        if (uploadError) throw uploadError;
+        const { data: urlData } = supabase.storage
+          .from("product-images")
+          .getPublicUrl(fileName);
+        imageUrl = urlData.publicUrl;
+      }
       const { error } = await supabase.from("products" as any).insert({
         title: listing.title,
         description: listing.description,
@@ -80,12 +104,14 @@ const UploadProductPage = () => {
         tags: listing.tags,
         price: `₹${manualPrice.toLocaleString("en-IN")}`,
         image_description: imageDescription,
+        image_url: imageUrl,
       } as any);
       if (error) throw error;
       toast.success("Product published successfully!");
       setListing(null);
       setPreview(null);
       setImageDescription("");
+      setSelectedFile(null);
     } catch (e: any) {
       console.error("Publish error:", e);
       toast.error(e.message || "Failed to publish product");
@@ -213,22 +239,22 @@ const UploadProductPage = () => {
               <Slider
                 value={[manualPrice]}
                 onValueChange={(v) => setManualPrice(v[0])}
-                min={50}
-                max={50000}
+                min={priceRange.min}
+                max={priceRange.max}
                 step={50}
                 className="w-full"
               />
               <div className="flex justify-between text-xs text-muted-foreground">
-                <span>₹50</span>
-                <span>₹50,000</span>
+                <span>₹{priceRange.min.toLocaleString("en-IN")}</span>
+                <span>₹{priceRange.max.toLocaleString("en-IN")}</span>
               </div>
               <Input
                 type="number"
                 value={manualPrice}
-                onChange={(e) => setManualPrice(Math.max(50, Math.min(50000, Number(e.target.value))))}
+                onChange={(e) => setManualPrice(Math.max(priceRange.min, Math.min(priceRange.max, Number(e.target.value))))}
                 className="w-32"
-                min={50}
-                max={50000}
+                min={priceRange.min}
+                max={priceRange.max}
               />
             </div>
 
