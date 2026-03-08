@@ -22,10 +22,11 @@ const fadeUp = {
 };
 
 const DashboardHome = () => {
+  const { user } = useAuth();
   const [productCount, setProductCount] = useState(0);
   const [listingCount, setListingCount] = useState(0);
   const [categoryCount, setCategoryCount] = useState(0);
-  const [priceCount, setPriceCount] = useState(0);
+  const [artisanName, setArtisanName] = useState("");
 
   useEffect(() => {
     const fetchStats = async () => {
