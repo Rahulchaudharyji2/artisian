@@ -54,7 +54,7 @@ const MyProductsPage = () => {
   const handleDelete = async (id: string) => {
     setDeleting(id);
     try {
-      const { error } = await (supabase.from as any)("products").delete().eq("id", id);
+      const { error } = await supabase.from("products").delete().eq("id", id);
       if (error) throw error;
       setProducts((prev) => prev.filter((p) => p.id !== id));
       toast.success("Product deleted");
