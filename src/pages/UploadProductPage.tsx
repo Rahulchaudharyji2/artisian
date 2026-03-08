@@ -68,7 +68,9 @@ const UploadProductPage = () => {
       if (error) throw error;
       if (data.error) throw new Error(data.error);
       setListing(data);
-      setManualPrice(parsePrice(data.price));
+      const parsed = parsePrice(data.price);
+      setManualPrice(parsed.mid);
+      setPriceRange({ min: parsed.min, max: parsed.max });
       toast.success("AI listing generated!");
     } catch (e: any) {
       console.error("Generate listing error:", e);
