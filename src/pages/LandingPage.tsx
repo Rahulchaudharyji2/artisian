@@ -20,31 +20,37 @@ const features = [
     icon: Camera,
     title: "Image → Listing",
     desc: "Upload a craft photo, get a complete product listing with title, description, tags & pricing.",
+    path: "/dashboard/upload",
   },
   {
     icon: Sparkles,
     title: "AI Story Generator",
     desc: "Turn your craft journey into compelling brand stories, Instagram captions & marketing copy.",
+    path: "/dashboard/story",
   },
   {
     icon: Globe,
     title: "Global Market Discovery",
     desc: "Find the best countries and buyer personas for your craft category worldwide.",
+    path: "/dashboard/markets",
   },
   {
     icon: MessageSquare,
     title: "Social Media Content",
     desc: "Generate Instagram captions, hashtags, reel scripts and marketing messages instantly.",
+    path: "/dashboard/social",
   },
   {
     icon: TrendingUp,
     title: "Smart Pricing AI",
     desc: "Get fair price suggestions based on craft type, materials, demand & global trends.",
+    path: "/dashboard/pricing",
   },
   {
     icon: Mic,
     title: "Voice Assistant",
     desc: "Speak commands in your language. Upload products, generate listings — hands-free.",
+    path: "/dashboard",
   },
 ];
 
