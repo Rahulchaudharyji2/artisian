@@ -13,6 +13,7 @@ import SocialMediaPage from "./pages/SocialMediaPage";
 import MarketDiscoveryPage from "./pages/MarketDiscoveryPage";
 import MyProductsPage from "./pages/MyProductsPage";
 import SmartPricingPage from "./pages/SmartPricingPage";
+import CraftDetectorPage from "./pages/CraftDetectorPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -34,6 +35,7 @@ const App = () => (
           <Route path="/dashboard/markets" element={<MarketDiscoveryPage />} />
           <Route path="/dashboard/products" element={<MyProductsPage />} />
           <Route path="/dashboard/pricing" element={<SmartPricingPage />} />
+          <Route path="/dashboard/craft-detector" element={<CraftDetectorPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

@@ -15,6 +15,7 @@ import {
   LogOut,
   ChevronLeft,
   ChevronRight,
+  Scan,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import VoiceAssistantFAB from "@/components/VoiceAssistantFAB";
@@ -24,6 +25,7 @@ const navItems = [
   { icon: LayoutDashboard, label: "Dashboard", path: "/dashboard" },
   { icon: Upload, label: "Upload Product", path: "/dashboard/upload" },
   { icon: Package, label: "My Products", path: "/dashboard/products" },
+  { icon: Scan, label: "Craft Detector", path: "/dashboard/craft-detector" },
   { icon: BookOpen, label: "Story Generator", path: "/dashboard/story" },
   { icon: Share2, label: "Social Media", path: "/dashboard/social" },
   { icon: Globe, label: "Market Discovery", path: "/dashboard/markets" },
