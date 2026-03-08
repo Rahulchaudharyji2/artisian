@@ -2,7 +2,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Share2, Sparkles, Loader2, Copy, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import DashboardLayout from "@/components/DashboardLayout";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -58,10 +58,12 @@ const SocialMediaPage = () => {
         </div>
 
         <div className="space-y-3">
-          <Input
-            placeholder="Describe your product... e.g. 'Handmade Madhubani painting on cotton canvas, 12x18 inches'"
+          <Textarea
+            placeholder="Describe your product... e.g. 'Handmade Madhubani painting on cotton canvas, 12x18 inches, with natural dyes and traditional motifs'"
             value={productDetails}
             onChange={(e) => setProductDetails(e.target.value)}
+            rows={5}
+            className="resize-none"
           />
           <Button variant="hero" onClick={handleGenerate} disabled={generating || !productDetails.trim()} className="gap-2">
             {generating ? (

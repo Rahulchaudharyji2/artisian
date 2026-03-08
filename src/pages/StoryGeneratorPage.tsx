@@ -1,6 +1,6 @@
-import { useState, useCallback } from "react";
+import { useState } from "react";
 import { motion } from "framer-motion";
-import { Sparkles, Loader2, Copy, Check, ImagePlus, X } from "lucide-react";
+import { Sparkles, Loader2, Copy, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import DashboardLayout from "@/components/DashboardLayout";
@@ -10,9 +10,6 @@ import { toast } from "sonner";
 const StoryGeneratorPage = () => {
   const [input, setInput] = useState("");
   const [generating, setGenerating] = useState(false);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [imageBase64, setImageBase64] = useState<string | null>(null);
-  const [isDragging, setIsDragging] = useState(false);
   const [story, setStory] = useState<{
     brandStory: string;
     aboutSection: string;
@@ -20,34 +17,12 @@ const StoryGeneratorPage = () => {
   } | null>(null);
   const [copied, setCopied] = useState<string | null>(null);
 
-  const handleFile = (file: File) => {
-    if (!file.type.startsWith("image/")) return;
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const result = e.target?.result as string;
-      setImagePreview(result);
-      // Extract base64 data after the comma
-      setImageBase64(result.split(",")[1]);
-    };
-    reader.readAsDataURL(file);
-  };
-
-  const onDrop = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragging(false);
-    const file = e.dataTransfer.files[0];
-    if (file) handleFile(file);
-  }, []);
-
   const handleGenerate = async () => {
-    if (!input.trim() && !imageBase64) {
-      toast.error("Please provide a story or upload an image");
-      return;
-    }
+    if (!input.trim()) return;
     setGenerating(true);
     try {
       const { data, error } = await supabase.functions.invoke("generate-story", {
-        body: { story: input, image: imageBase64 },
+        body: { story: input },
       });
       if (error) throw error;
       if (data.error) throw new Error(data.error);
@@ -87,53 +62,6 @@ const StoryGeneratorPage = () => {
           <p className="text-muted-foreground mt-1">Turn your craft journey into compelling brand content.</p>
         </div>
 
-        {/* Image upload area */}
-        <div
-          onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
-          onDragLeave={() => setIsDragging(false)}
-          onDrop={onDrop}
-          className={`relative border-2 border-dashed rounded-xl p-6 text-center transition-colors ${
-            isDragging ? "border-primary bg-primary/5" : "border-border"
-          }`}
-        >
-          {imagePreview ? (
-            <div className="flex items-center gap-4">
-              <img src={imagePreview} alt="Craft preview" className="h-24 w-24 rounded-lg object-cover" />
-              <div className="text-left flex-1">
-                <p className="text-sm font-medium text-foreground">Photo attached</p>
-                <p className="text-xs text-muted-foreground">AI will use this to personalize your brand story</p>
-              </div>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8"
-                onClick={() => { setImagePreview(null); setImageBase64(null); }}
-              >
-                <X className="w-4 h-4" />
-              </Button>
-            </div>
-          ) : (
-            <label className="cursor-pointer flex flex-col items-center gap-2">
-              <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center">
-                <ImagePlus className="w-6 h-6 text-muted-foreground" />
-              </div>
-              <div>
-                <p className="text-sm font-medium text-foreground">Upload a photo <span className="text-muted-foreground">(optional)</span></p>
-                <p className="text-xs text-muted-foreground">Share a photo of yourself, your family, or your workspace to personalize the story</p>
-              </div>
-              <input
-                type="file"
-                accept="image/*"
-                className="hidden"
-                onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  if (file) handleFile(file);
-                }}
-              />
-            </label>
-          )}
-        </div>
-
         <div className="space-y-3">
           <Textarea
             placeholder="Tell us about your craft journey... e.g. 'My family has been making Madhubani paintings for three generations in Bihar.'"
@@ -142,7 +70,7 @@ const StoryGeneratorPage = () => {
             rows={4}
             className="resize-none"
           />
-          <Button variant="hero" onClick={handleGenerate} disabled={generating || (!input.trim() && !imageBase64)} className="gap-2">
+          <Button variant="hero" onClick={handleGenerate} disabled={generating || !input.trim()} className="gap-2">
             {generating ? (
               <><Loader2 className="w-4 h-4 animate-spin" /> Generating...</>
             ) : (
