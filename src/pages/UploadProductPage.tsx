@@ -8,8 +8,10 @@ import { Slider } from "@/components/ui/slider";
 import DashboardLayout from "@/components/DashboardLayout";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useAuth } from "@/hooks/useAuth";
 
 const UploadProductPage = () => {
+  const { user } = useAuth();
   const [preview, setPreview] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [generating, setGenerating] = useState(false);
@@ -172,6 +174,7 @@ const UploadProductPage = () => {
         price: `₹${manualPrice.toLocaleString("en-IN")}`,
         image_description: imageDescription,
         image_url: imageUrl,
+        user_id: user?.id,
       } as any);
       if (error) throw error;
       toast.success("Product published successfully!");
