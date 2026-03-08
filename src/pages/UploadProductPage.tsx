@@ -41,12 +41,18 @@ const UploadProductPage = () => {
     if (file) handleFile(file);
   }, []);
 
-  // Parse AI price suggestion to set slider default
-  const parsePrice = (priceStr: string): number => {
+  // Parse AI price suggestion to set slider default and range
+  const parsePrice = (priceStr: string): { mid: number; min: number; max: number } => {
     const matches = priceStr.match(/[\d,]+/g);
-    if (!matches) return 500;
+    if (!matches) return { mid: 500, min: 100, max: 5000 };
     const nums = matches.map((m) => parseInt(m.replace(/,/g, ""), 10));
-    return nums.length >= 2 ? Math.round((nums[0] + nums[1]) / 2) : nums[0];
+    if (nums.length >= 2) {
+      const low = Math.min(nums[0], nums[1]);
+      const high = Math.max(nums[0], nums[1]);
+      const mid = Math.round((low + high) / 2);
+      return { mid, min: Math.max(50, Math.round(low * 0.5)), max: Math.round(high * 2) };
+    }
+    return { mid: nums[0], min: Math.max(50, Math.round(nums[0] * 0.5)), max: Math.round(nums[0] * 3) };
   };
 
   const handleGenerate = async () => {
