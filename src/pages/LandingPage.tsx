@@ -1,7 +1,8 @@
 import { motion } from "framer-motion";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { ArrowRight, Sparkles, Camera, Globe, MessageSquare, TrendingUp, Mic } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/hooks/useAuth";
 import heroCrafts from "@/assets/hero-crafts.jpg";
 import kalaLogo from "@/assets/kala-logo.png";
 
