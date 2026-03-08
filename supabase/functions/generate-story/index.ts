@@ -36,13 +36,13 @@ serve(async (req) => {
             type: "function",
             function: {
               name: "create_brand_content",
-              description: "Generate brand storytelling content from an artisan's story and/or craft image",
+              description: "Generate rich, long-form brand storytelling content from an artisan's story",
               parameters: {
                 type: "object",
                 properties: {
-                  brandStory: { type: "string", description: "A compelling brand story paragraph (3-4 sentences)" },
-                  aboutSection: { type: "string", description: "Website about section (2-3 sentences)" },
-                  instagramCaption: { type: "string", description: "Instagram caption with emojis and hashtags" }
+                  brandStory: { type: "string", description: "A detailed, compelling brand story of 2-3 paragraphs (at least 150 words). Include the artisan's heritage, the craft tradition, materials used, techniques, and emotional connection to the work." },
+                  aboutSection: { type: "string", description: "A detailed website about section of 1-2 paragraphs (at least 80 words). Cover the artisan's mission, values, and what makes their craft unique." },
+                  instagramCaption: { type: "string", description: "A detailed Instagram caption (at least 100 words) with a storytelling hook, emotional narrative, call-to-action, emojis, and 10-15 relevant hashtags." }
                 },
                 required: ["brandStory", "aboutSection", "instagramCaption"],
                 additionalProperties: false
