@@ -4,6 +4,8 @@ import { Sparkles, Loader2, Copy, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import DashboardLayout from "@/components/DashboardLayout";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 const StoryGeneratorPage = () => {
   const [input, setInput] = useState("");
@@ -15,20 +17,23 @@ const StoryGeneratorPage = () => {
   } | null>(null);
   const [copied, setCopied] = useState<string | null>(null);
 
-  const handleGenerate = () => {
+  const handleGenerate = async () => {
     if (!input.trim()) return;
     setGenerating(true);
-    setTimeout(() => {
-      setStory({
-        brandStory:
-          "Born from the fertile lands of Bihar, our Madhubani paintings carry the whispers of three generations of master artisans. Each stroke is a dialogue between ancient tradition and contemporary expression — vivid colors dancing on handmade paper, telling stories of nature, mythology, and the human spirit. When you bring a Madhubani piece home, you don't just own art — you become part of a living legacy.",
-        aboutSection:
-          "We are a family of Madhubani artists from Bihar, India, keeping alive a 2,500-year-old art tradition. Our paintings use natural dyes and traditional techniques passed down through generations. Every piece is handcrafted with love, patience, and deep cultural reverence.",
-        instagramCaption:
-          "Three generations. One art form. Infinite stories. 🎨\n\nOur Madhubani paintings aren't just art — they're conversations across centuries. Each piece carries the soul of Bihar.\n\n#MadhubaniArt #HandmadeInIndia #ArtisanStories #CulturalHeritage #SupportArtisans",
+    try {
+      const { data, error } = await supabase.functions.invoke("generate-story", {
+        body: { story: input },
       });
+      if (error) throw error;
+      if (data.error) throw new Error(data.error);
+      setStory(data);
+      toast.success("Brand content generated!");
+    } catch (e: any) {
+      console.error("Generate story error:", e);
+      toast.error(e.message || "Failed to generate story");
+    } finally {
       setGenerating(false);
-    }, 2000);
+    }
   };
 
   const copyText = (text: string, key: string) => {
