@@ -61,6 +61,7 @@ const ProfilePage = () => {
       toast.error("Failed to save profile");
     } else {
       toast.success("Profile saved successfully!");
+      setIsEditing(false);
     }
   };
 
