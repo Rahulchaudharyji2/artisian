@@ -5,6 +5,7 @@ import DashboardLayout from "@/components/DashboardLayout";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { useAuth } from "@/hooks/useAuth";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -31,23 +32,29 @@ interface Product {
 
 const MyProductsPage = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [deleting, setDeleting] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchProducts = async () => {
-      const { data, error } = await (supabase.from as any)("products").select("*").order("created_at", { ascending: false });
+      if (!user) return;
+      const { data, error } = await supabase
+        .from("products")
+        .select("*")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false });
       if (!error && data) setProducts(data);
       setLoading(false);
     };
     fetchProducts();
-  }, []);
+  }, [user]);
 
   const handleDelete = async (id: string) => {
     setDeleting(id);
     try {
-      const { error } = await (supabase.from as any)("products").delete().eq("id", id);
+      const { error } = await supabase.from("products").delete().eq("id", id);
       if (error) throw error;
       setProducts((prev) => prev.filter((p) => p.id !== id));
       toast.success("Product deleted");

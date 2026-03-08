@@ -18,6 +18,10 @@ import CraftDetectorPage from "./pages/CraftDetectorPage";
 import ProfilePage from "./pages/ProfilePage";
 import ProductDetailPage from "./pages/ProductDetailPage";
 import NotFound from "./pages/NotFound";
+import BrowseProductsPage from "./pages/BrowseProductsPage";
+import BrowseStoriesPage from "./pages/BrowseStoriesPage";
+import PublicProductDetailPage from "./pages/PublicProductDetailPage";
+import ArtisanProfilePage from "./pages/ArtisanProfilePage";
 
 const queryClient = new QueryClient();
 
@@ -30,6 +34,10 @@ const App = () => (
         <AuthProvider>
           <Routes>
             <Route path="/" element={<LandingPage />} />
+            <Route path="/products" element={<BrowseProductsPage />} />
+            <Route path="/products/:id" element={<PublicProductDetailPage />} />
+            <Route path="/stories" element={<BrowseStoriesPage />} />
+            <Route path="/artisan/:id" element={<ArtisanProfilePage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/signup" element={<SignupPage />} />
             <Route path="/dashboard" element={<RequireAuth><DashboardHome /></RequireAuth>} />
