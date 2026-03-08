@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Package, Loader2, Trash2 } from "lucide-react";
 import DashboardLayout from "@/components/DashboardLayout";
 import { supabase } from "@/integrations/supabase/client";
@@ -29,6 +30,7 @@ interface Product {
 }
 
 const MyProductsPage = () => {
+  const navigate = useNavigate();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [deleting, setDeleting] = useState<string | null>(null);
@@ -76,7 +78,11 @@ const MyProductsPage = () => {
         ) : (
           <div className="grid gap-4 sm:grid-cols-2">
             {products.map((p) => (
-              <div key={p.id} className="bg-card border border-border rounded-xl overflow-hidden">
+              <div
+                key={p.id}
+                onClick={() => navigate(`/dashboard/products/${p.id}`)}
+                className="bg-card border border-border rounded-xl overflow-hidden cursor-pointer hover:shadow-md transition-shadow"
+              >
                 {p.image_url ? (
                   <img src={p.image_url} alt={p.title} className="w-full h-48 object-cover" />
                 ) : (
@@ -102,7 +108,7 @@ const MyProductsPage = () => {
                       </span>
                     ))}
                   </div>
-                  <div className="pt-2">
+                  <div className="pt-2" onClick={(e) => e.stopPropagation()}>
                     <AlertDialog>
                       <AlertDialogTrigger asChild>
                         <Button variant="outline" size="sm" className="gap-1.5 text-destructive hover:text-destructive">

@@ -16,6 +16,7 @@ import MyProductsPage from "./pages/MyProductsPage";
 import SmartPricingPage from "./pages/SmartPricingPage";
 import CraftDetectorPage from "./pages/CraftDetectorPage";
 import ProfilePage from "./pages/ProfilePage";
+import ProductDetailPage from "./pages/ProductDetailPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -37,6 +38,7 @@ const App = () => (
             <Route path="/dashboard/social" element={<RequireAuth><SocialMediaPage /></RequireAuth>} />
             <Route path="/dashboard/markets" element={<RequireAuth><MarketDiscoveryPage /></RequireAuth>} />
             <Route path="/dashboard/products" element={<RequireAuth><MyProductsPage /></RequireAuth>} />
+            <Route path="/dashboard/products/:id" element={<RequireAuth><ProductDetailPage /></RequireAuth>} />
             <Route path="/dashboard/pricing" element={<RequireAuth><SmartPricingPage /></RequireAuth>} />
             <Route path="/dashboard/craft-detector" element={<RequireAuth><CraftDetectorPage /></RequireAuth>} />
             <Route path="/dashboard/profile" element={<RequireAuth><ProfilePage /></RequireAuth>} />
