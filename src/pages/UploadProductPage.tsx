@@ -174,6 +174,7 @@ const UploadProductPage = () => {
         price: `₹${manualPrice.toLocaleString("en-IN")}`,
         image_description: imageDescription,
         image_url: imageUrl,
+        user_id: user?.id,
       } as any);
       if (error) throw error;
       toast.success("Product published successfully!");
