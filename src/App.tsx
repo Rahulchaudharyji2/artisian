@@ -31,6 +31,7 @@ const App = () => (
           <Route path="/dashboard/story" element={<StoryGeneratorPage />} />
           <Route path="/dashboard/social" element={<SocialMediaPage />} />
           <Route path="/dashboard/markets" element={<MarketDiscoveryPage />} />
+          <Route path="/dashboard/products" element={<MyProductsPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
