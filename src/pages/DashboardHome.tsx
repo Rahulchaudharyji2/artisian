@@ -50,7 +50,6 @@ const DashboardHome = () => {
     { label: "Products", value: productCount.toString(), icon: Package },
     { label: "AI Listings", value: listingCount.toString(), icon: BookOpen },
     { label: "Categories", value: categoryCount.toString(), icon: Globe },
-    { label: "Priced Items", value: priceCount.toString(), icon: TrendingUp },
   ];
 
   return (
