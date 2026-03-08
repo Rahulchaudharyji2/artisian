@@ -4,6 +4,7 @@ import { Upload, Package, BookOpen, Share2, Globe, TrendingUp, ArrowRight } from
 import { Link } from "react-router-dom";
 import DashboardLayout from "@/components/DashboardLayout";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 
 const quickActions = [
   { icon: Upload, label: "Upload Product", desc: "Create AI listing from photo", path: "/dashboard/upload", color: "gradient-hero" },
