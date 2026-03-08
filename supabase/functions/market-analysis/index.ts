@@ -32,7 +32,7 @@ serve(async (req) => {
 - Product Category: ${productCategory}
 - Craft Type: ${craftType}
 
-Include specific countries with detailed reasons, real marketplace recommendations, seasonal trends, competition analysis, and actionable marketing strategies. Be specific and data-driven — avoid generic advice.`
+IMPORTANT: The first market in topMarkets must always be India (domestic market) with its specific demand analysis. Then list 4 more international countries. Include specific countries with detailed reasons, real marketplace recommendations, seasonal trends, competition analysis, and actionable marketing strategies. Be specific and data-driven — avoid generic advice.`
           }
         ],
         tools: [
