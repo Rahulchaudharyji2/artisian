@@ -1,7 +1,8 @@
 import { motion } from "framer-motion";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { ArrowRight, Sparkles, Camera, Globe, MessageSquare, TrendingUp, Mic } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/hooks/useAuth";
 import heroCrafts from "@/assets/hero-crafts.jpg";
 import kalaLogo from "@/assets/kala-logo.png";
 
@@ -19,35 +20,52 @@ const features = [
     icon: Camera,
     title: "Image → Listing",
     desc: "Upload a craft photo, get a complete product listing with title, description, tags & pricing.",
+    path: "/dashboard/upload",
   },
   {
     icon: Sparkles,
     title: "AI Story Generator",
     desc: "Turn your craft journey into compelling brand stories, Instagram captions & marketing copy.",
+    path: "/dashboard/story",
   },
   {
     icon: Globe,
     title: "Global Market Discovery",
     desc: "Find the best countries and buyer personas for your craft category worldwide.",
+    path: "/dashboard/markets",
   },
   {
     icon: MessageSquare,
     title: "Social Media Content",
     desc: "Generate Instagram captions, hashtags, reel scripts and marketing messages instantly.",
+    path: "/dashboard/social",
   },
   {
     icon: TrendingUp,
     title: "Smart Pricing AI",
     desc: "Get fair price suggestions based on craft type, materials, demand & global trends.",
+    path: "/dashboard/pricing",
   },
   {
     icon: Mic,
     title: "Voice Assistant",
     desc: "Speak commands in your language. Upload products, generate listings — hands-free.",
+    path: "/dashboard",
   },
 ];
 
 const LandingPage = () => {
+  const { session } = useAuth();
+  const navigate = useNavigate();
+
+  const handleFeatureClick = (path: string) => {
+    if (session) {
+      navigate(path);
+    } else {
+      navigate("/login");
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
       {/* Nav */}
@@ -63,12 +81,20 @@ const LandingPage = () => {
             <a href="#stories" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Stories</a>
           </div>
           <div className="flex items-center gap-3">
-            <Link to="/login">
-              <Button variant="ghost" size="sm">Log In</Button>
-            </Link>
-            <Link to="/signup">
-              <Button variant="hero" size="sm">Get Started</Button>
-            </Link>
+            {session ? (
+              <Link to="/dashboard">
+                <Button variant="hero" size="sm">Dashboard</Button>
+              </Link>
+            ) : (
+              <>
+                <Link to="/login">
+                  <Button variant="ghost" size="sm">Log In</Button>
+                </Link>
+                <Link to="/signup">
+                  <Button variant="hero" size="sm">Get Started</Button>
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </nav>
@@ -198,7 +224,8 @@ const LandingPage = () => {
                 viewport={{ once: true }}
                 variants={fadeUp}
                 custom={i}
-                className="group bg-background rounded-xl p-6 shadow-card border border-border hover:shadow-warm transition-shadow duration-300"
+                onClick={() => handleFeatureClick(f.path)}
+                className="group bg-background rounded-xl p-6 shadow-card border border-border hover:shadow-warm transition-shadow duration-300 cursor-pointer"
               >
                 <div className="w-12 h-12 rounded-lg gradient-hero flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                   <f.icon className="w-6 h-6 text-primary-foreground" />
