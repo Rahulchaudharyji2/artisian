@@ -4,15 +4,28 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 import kalaLogo from "@/assets/kala-logo.png";
 
 const LoginPage = () => {
   const navigate = useNavigate();
   const [form, setForm] = useState({ email: "", password: "" });
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    navigate("/dashboard");
+    setLoading(true);
+    const { error } = await supabase.auth.signInWithPassword({
+      email: form.email,
+      password: form.password,
+    });
+    setLoading(false);
+    if (error) {
+      toast.error(error.message);
+    } else {
+      navigate("/dashboard");
+    }
   };
 
   return (
@@ -51,8 +64,8 @@ const LoginPage = () => {
               required
             />
           </div>
-          <Button type="submit" variant="hero" className="w-full" size="lg">
-            Log In
+          <Button type="submit" variant="hero" className="w-full" size="lg" disabled={loading}>
+            {loading ? "Logging in…" : "Log In"}
           </Button>
         </form>
         <p className="text-center text-sm text-muted-foreground">
