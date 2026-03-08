@@ -84,6 +84,19 @@ const UploadProductPage = () => {
     if (!listing) return;
     setPublishing(true);
     try {
+      let imageUrl: string | null = null;
+      if (selectedFile) {
+        const fileExt = selectedFile.name.split(".").pop();
+        const fileName = `${crypto.randomUUID()}.${fileExt}`;
+        const { error: uploadError } = await supabase.storage
+          .from("product-images")
+          .upload(fileName, selectedFile);
+        if (uploadError) throw uploadError;
+        const { data: urlData } = supabase.storage
+          .from("product-images")
+          .getPublicUrl(fileName);
+        imageUrl = urlData.publicUrl;
+      }
       const { error } = await supabase.from("products" as any).insert({
         title: listing.title,
         description: listing.description,
@@ -91,12 +104,14 @@ const UploadProductPage = () => {
         tags: listing.tags,
         price: `₹${manualPrice.toLocaleString("en-IN")}`,
         image_description: imageDescription,
+        image_url: imageUrl,
       } as any);
       if (error) throw error;
       toast.success("Product published successfully!");
       setListing(null);
       setPreview(null);
       setImageDescription("");
+      setSelectedFile(null);
     } catch (e: any) {
       console.error("Publish error:", e);
       toast.error(e.message || "Failed to publish product");
