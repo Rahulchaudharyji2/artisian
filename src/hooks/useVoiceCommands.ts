@@ -131,7 +131,7 @@ export const useVoiceCommands = () => {
 
     recognition.onerror = (event: any) => {
       if (event.error === "network") {
-        toast.error("Voice requires internet connection. Please check your network.");
+        toast.error("Voice recognition needs a direct browser tab. Try publishing your app or opening it in a new tab.", { duration: 5000 });
       } else if (event.error === "not-allowed") {
         toast.error("Microphone access denied. Please allow microphone in browser settings.");
       } else if (event.error !== "aborted") {
