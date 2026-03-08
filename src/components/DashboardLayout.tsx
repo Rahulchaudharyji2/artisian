@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   LayoutDashboard,
@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import VoiceAssistantFAB from "@/components/VoiceAssistantFAB";
+import { useAuth } from "@/hooks/useAuth";
 import kalaLogo from "@/assets/kala-logo.png";
 
 const navItems = [
@@ -37,6 +38,13 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
+  const { signOut } = useAuth();
+
+  const handleLogout = async () => {
+    await signOut();
+    navigate("/login");
+  };
 
   return (
     <div className="min-h-screen bg-background flex">
@@ -75,17 +83,17 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
           })}
         </nav>
         <div className="p-3 space-y-1">
-          <Link to="/" title={collapsed ? "Log Out" : undefined}>
-            <Button
-              variant="ghost"
-              className={`w-full gap-2 text-sidebar-foreground/70 hover:text-sidebar-foreground ${
-                collapsed ? "justify-center px-0" : "justify-start"
-              }`}
-            >
-              <LogOut className="w-4 h-4 flex-shrink-0" />
-              {!collapsed && "Log Out"}
-            </Button>
-          </Link>
+          <Button
+            variant="ghost"
+            onClick={handleLogout}
+            title={collapsed ? "Log Out" : undefined}
+            className={`w-full gap-2 text-sidebar-foreground/70 hover:text-sidebar-foreground ${
+              collapsed ? "justify-center px-0" : "justify-start"
+            }`}
+          >
+            <LogOut className="w-4 h-4 flex-shrink-0" />
+            {!collapsed && "Log Out"}
+          </Button>
         </div>
 
         {/* Collapse toggle */}
@@ -144,6 +152,16 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
                   );
                 })}
               </nav>
+              <div className="p-3">
+                <Button
+                  variant="ghost"
+                  onClick={handleLogout}
+                  className="w-full gap-2 text-sidebar-foreground/70 hover:text-sidebar-foreground justify-start"
+                >
+                  <LogOut className="w-4 h-4" />
+                  Log Out
+                </Button>
+              </div>
             </motion.aside>
           </>
         )}
