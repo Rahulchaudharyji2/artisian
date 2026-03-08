@@ -1,20 +1,15 @@
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Upload, Package, BookOpen, Share2, Globe, TrendingUp, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import DashboardLayout from "@/components/DashboardLayout";
+import { supabase } from "@/integrations/supabase/client";
 
 const quickActions = [
   { icon: Upload, label: "Upload Product", desc: "Create AI listing from photo", path: "/dashboard/upload", color: "gradient-hero" },
   { icon: BookOpen, label: "Generate Story", desc: "Tell your craft story", path: "/dashboard/story", color: "gradient-indigo" },
   { icon: Share2, label: "Social Content", desc: "Marketing posts & captions", path: "/dashboard/social", color: "gradient-hero" },
   { icon: Globe, label: "Market Insights", desc: "Find global buyers", path: "/dashboard/markets", color: "gradient-indigo" },
-];
-
-const stats = [
-  { label: "Products", value: "0", icon: Package },
-  { label: "AI Listings", value: "0", icon: BookOpen },
-  { label: "Markets Reached", value: "0", icon: Globe },
-  { label: "Price Insights", value: "0", icon: TrendingUp },
 ];
 
 const fadeUp = {
