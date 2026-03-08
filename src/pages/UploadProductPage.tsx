@@ -18,6 +18,9 @@ const UploadProductPage = () => {
   const [manualPrice, setManualPrice] = useState(500);
   const [priceRange, setPriceRange] = useState<{ min: number; max: number }>({ min: 50, max: 50000 });
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [isListening, setIsListening] = useState(false);
+  const recognitionRef = useRef<any>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [listing, setListing] = useState<{
     title: string;
     description: string;
@@ -25,6 +28,63 @@ const UploadProductPage = () => {
     tags: string[];
     price: string;
   } | null>(null);
+
+  // Auto-resize textarea
+  useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = "auto";
+      textareaRef.current.style.height = textareaRef.current.scrollHeight + "px";
+    }
+  }, [imageDescription]);
+
+  // Voice input using Web Speech API
+  const toggleVoiceInput = useCallback(() => {
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      toast.error("Speech recognition is not supported in your browser");
+      return;
+    }
+
+    if (isListening && recognitionRef.current) {
+      recognitionRef.current.stop();
+      setIsListening(false);
+      return;
+    }
+
+    const recognition = new SpeechRecognition();
+    recognition.continuous = true;
+    recognition.interimResults = true;
+    recognition.lang = "en-IN";
+    recognitionRef.current = recognition;
+
+    let finalTranscript = imageDescription;
+
+    recognition.onresult = (event: any) => {
+      let interim = "";
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        if (event.results[i].isFinal) {
+          finalTranscript += (finalTranscript ? " " : "") + event.results[i][0].transcript;
+        } else {
+          interim += event.results[i][0].transcript;
+        }
+      }
+      setImageDescription(finalTranscript + (interim ? " " + interim : ""));
+    };
+
+    recognition.onerror = (event: any) => {
+      console.error("Speech recognition error:", event.error);
+      toast.error("Voice input error: " + event.error);
+      setIsListening(false);
+    };
+
+    recognition.onend = () => {
+      setIsListening(false);
+    };
+
+    recognition.start();
+    setIsListening(true);
+    toast.success("Listening... Speak now!");
+  }, [isListening, imageDescription]);
 
   const handleFile = (file: File) => {
     if (!file.type.startsWith("image/")) return;
