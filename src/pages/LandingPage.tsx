@@ -55,6 +55,17 @@ const features = [
 ];
 
 const LandingPage = () => {
+  const { session } = useAuth();
+  const navigate = useNavigate();
+
+  const handleFeatureClick = (path: string) => {
+    if (session) {
+      navigate(path);
+    } else {
+      navigate("/login");
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
       {/* Nav */}
