@@ -21,6 +21,38 @@ const fadeUp = {
 };
 
 const DashboardHome = () => {
+  const [productCount, setProductCount] = useState(0);
+  const [listingCount, setListingCount] = useState(0);
+  const [categoryCount, setCategoryCount] = useState(0);
+  const [priceCount, setPriceCount] = useState(0);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      const { data: products } = await supabase.from("products").select("id, description, category, price");
+      if (products) {
+        setProductCount(products.length);
+        setListingCount(products.filter(p => p.description && p.description.length > 50).length);
+        setCategoryCount(new Set(products.map(p => p.category)).size);
+        setPriceCount(products.filter(p => p.price && parseFloat(p.price) > 0).length);
+      }
+    };
+    fetchStats();
+
+    const channel = supabase
+      .channel("products-stats")
+      .on("postgres_changes", { event: "*", schema: "public", table: "products" }, () => fetchStats())
+      .subscribe();
+
+    return () => { supabase.removeChannel(channel); };
+  }, []);
+
+  const stats = [
+    { label: "Products", value: productCount.toString(), icon: Package },
+    { label: "AI Listings", value: listingCount.toString(), icon: BookOpen },
+    { label: "Categories", value: categoryCount.toString(), icon: Globe },
+    { label: "Priced Items", value: priceCount.toString(), icon: TrendingUp },
+  ];
+
   return (
     <DashboardLayout>
       <div className="space-y-8">
