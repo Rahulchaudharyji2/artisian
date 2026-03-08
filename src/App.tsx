@@ -16,6 +16,7 @@ import MyProductsPage from "./pages/MyProductsPage";
 import SmartPricingPage from "./pages/SmartPricingPage";
 import CraftDetectorPage from "./pages/CraftDetectorPage";
 import ProfilePage from "./pages/ProfilePage";
+import ProductDetailPage from "./pages/ProductDetailPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
