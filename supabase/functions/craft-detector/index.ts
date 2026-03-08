@@ -12,7 +12,9 @@ serve(async (req) => {
   }
 
   try {
-    const { craftDescription } = await req.json();
+    const { imageBase64 } = await req.json();
+    if (!imageBase64) throw new Error("No image provided");
+
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
@@ -23,15 +25,26 @@ serve(async (req) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-3-flash-preview",
+        model: "google/gemini-2.5-flash",
         messages: [
           {
             role: "system",
-            content: `You are an expert cultural anthropologist and craft historian specializing in Indian and global handicrafts. Given a description of a craft product, analyze it deeply and return structured data about its cultural significance. Be specific with historical dates, regions, and cultural context. Include fascinating lesser-known facts. Always provide rich, educational content that helps artisans understand and communicate the heritage value of their craft.`,
+            content: `You are an expert cultural anthropologist and craft historian specializing in Indian and global handicrafts. You will be shown an image of a craft product. Analyze it visually and return structured data about its cultural significance. Be specific with historical dates, regions, and cultural context. Include fascinating lesser-known facts.`,
           },
           {
             role: "user",
-            content: `Analyze this craft product and detect its cultural details: "${craftDescription}"`,
+            content: [
+              {
+                type: "text",
+                text: "Analyze this craft product image and detect its craft type, origin region, and cultural history.",
+              },
+              {
+                type: "image_url",
+                image_url: {
+                  url: imageBase64,
+                },
+              },
+            ],
           },
         ],
         tools: [
@@ -39,7 +52,7 @@ serve(async (req) => {
             type: "function",
             function: {
               name: "detect_craft_culture",
-              description: "Return structured cultural analysis of a craft product",
+              description: "Return structured cultural analysis of a craft product from its image",
               parameters: {
                 type: "object",
                 properties: {
@@ -48,12 +61,8 @@ serve(async (req) => {
                     properties: {
                       name: { type: "string", description: "Specific craft type name (e.g., Madhubani Painting, Blue Pottery)" },
                       category: { type: "string", description: "Broad category (e.g., Textile, Pottery, Painting, Metalwork, Woodwork)" },
-                      technique: { type: "string", description: "Primary technique used (e.g., hand-painted, wheel-thrown, block-printed)" },
-                      materials: {
-                        type: "array",
-                        items: { type: "string" },
-                        description: "Traditional materials used",
-                      },
+                      technique: { type: "string", description: "Primary technique used" },
+                      materials: { type: "array", items: { type: "string" }, description: "Traditional materials used" },
                     },
                     required: ["name", "category", "technique", "materials"],
                   },
@@ -63,34 +72,27 @@ serve(async (req) => {
                       state: { type: "string", description: "State or province of origin" },
                       district: { type: "string", description: "Specific district or city" },
                       country: { type: "string", description: "Country of origin" },
-                      geoTag: { type: "string", description: "GI tag status if applicable (e.g., 'GI Tagged since 2005')" },
+                      geoTag: { type: "string", description: "GI tag status if applicable" },
                     },
                     required: ["state", "district", "country"],
                   },
                   culturalHistory: {
                     type: "object",
                     properties: {
-                      era: { type: "string", description: "Historical era or period of origin (e.g., '16th century Mughal era')" },
+                      era: { type: "string", description: "Historical era or period of origin" },
                       story: { type: "string", description: "Rich narrative about the craft's cultural history (3-4 sentences)" },
                       significance: { type: "string", description: "Cultural and spiritual significance" },
-                      patronage: { type: "string", description: "Historical patronage (e.g., royal courts, temples)" },
-                      currentStatus: { type: "string", description: "Current status of the craft tradition (thriving, endangered, reviving)" },
+                      patronage: { type: "string", description: "Historical patronage" },
+                      currentStatus: { type: "string", description: "Current status: thriving, endangered, or reviving" },
                     },
                     required: ["era", "story", "significance", "patronage", "currentStatus"],
                   },
-                  funFacts: {
-                    type: "array",
-                    items: { type: "string" },
-                    description: "3 interesting lesser-known facts about this craft",
-                  },
+                  funFacts: { type: "array", items: { type: "string" }, description: "3 interesting lesser-known facts" },
                   similarCrafts: {
                     type: "array",
                     items: {
                       type: "object",
-                      properties: {
-                        name: { type: "string" },
-                        region: { type: "string" },
-                      },
+                      properties: { name: { type: "string" }, region: { type: "string" } },
                       required: ["name", "region"],
                     },
                     description: "3 similar crafts from other regions",
@@ -109,15 +111,13 @@ serve(async (req) => {
       const errorText = await response.text();
       console.error("AI gateway error:", response.status, errorText);
       if (response.status === 429) {
-        return new Response(JSON.stringify({ error: "Rate limit exceeded. Please wait a moment and try again." }), {
-          status: 429,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        return new Response(JSON.stringify({ error: "Rate limit exceeded. Please wait and try again." }), {
+          status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
       if (response.status === 402) {
-        return new Response(JSON.stringify({ error: "AI credits exhausted. Please add credits to continue." }), {
-          status: 402,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        return new Response(JSON.stringify({ error: "AI credits exhausted. Please add credits." }), {
+          status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
       throw new Error("AI gateway error: " + response.status);
@@ -134,8 +134,7 @@ serve(async (req) => {
   } catch (e) {
     console.error("craft-detector error:", e);
     return new Response(JSON.stringify({ error: e.message || "Failed to analyze craft" }), {
-      status: 500,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
 });
