@@ -47,7 +47,15 @@ const MyProductsPage = () => {
         ) : (
           <div className="grid gap-4 sm:grid-cols-2">
             {products.map((p) => (
-              <div key={p.id} className="bg-card border border-border rounded-xl p-5 space-y-3">
+              <div key={p.id} className="bg-card border border-border rounded-xl overflow-hidden space-y-0">
+                {p.image_url ? (
+                  <img src={p.image_url} alt={p.title} className="w-full h-48 object-cover" />
+                ) : (
+                  <div className="w-full h-48 bg-muted flex items-center justify-center">
+                    <Package className="w-10 h-10 text-muted-foreground" />
+                  </div>
+                )}
+                <div className="p-5 space-y-3">
                 <div className="flex items-start justify-between">
                   <h3 className="font-semibold text-foreground leading-tight">{p.title}</h3>
                   <span className="text-sm font-bold text-primary whitespace-nowrap ml-2">{p.price}</span>
