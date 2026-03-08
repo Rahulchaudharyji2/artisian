@@ -27,6 +27,7 @@ const UploadProductPage = () => {
 
   const handleFile = (file: File) => {
     if (!file.type.startsWith("image/")) return;
+    setSelectedFile(file);
     const reader = new FileReader();
     reader.onload = (e) => setPreview(e.target?.result as string);
     reader.readAsDataURL(file);
