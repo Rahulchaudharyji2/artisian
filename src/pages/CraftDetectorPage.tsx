@@ -1,118 +1,65 @@
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useCallback } from "react";
 import { motion } from "framer-motion";
 import {
   Search,
-  Sparkles,
   Loader2,
   MapPin,
   Clock,
   Lightbulb,
   Layers,
   Globe,
-  Mic,
-  MicOff,
   Shield,
+  ImagePlus,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
 import DashboardLayout from "@/components/DashboardLayout";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 interface CraftAnalysis {
-  craftType: {
-    name: string;
-    category: string;
-    technique: string;
-    materials: string[];
-  };
-  originRegion: {
-    state: string;
-    district: string;
-    country: string;
-    geoTag?: string;
-  };
-  culturalHistory: {
-    era: string;
-    story: string;
-    significance: string;
-    patronage: string;
-    currentStatus: string;
-  };
+  craftType: { name: string; category: string; technique: string; materials: string[] };
+  originRegion: { state: string; district: string; country: string; geoTag?: string };
+  culturalHistory: { era: string; story: string; significance: string; patronage: string; currentStatus: string };
   funFacts: string[];
   similarCrafts: { name: string; region: string }[];
 }
 
 const CraftDetectorPage = () => {
-  const [description, setDescription] = useState("");
+  const [preview, setPreview] = useState<string | null>(null);
+  const [imageBase64, setImageBase64] = useState<string | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
   const [analyzing, setAnalyzing] = useState(false);
   const [result, setResult] = useState<CraftAnalysis | null>(null);
-  const [isListening, setIsListening] = useState(false);
-  const recognitionRef = useRef<any>(null);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  useEffect(() => {
-    if (textareaRef.current) {
-      textareaRef.current.style.height = "auto";
-      textareaRef.current.style.height = textareaRef.current.scrollHeight + "px";
-    }
-  }, [description]);
+  const handleFile = (file: File) => {
+    if (!file.type.startsWith("image/")) return;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const dataUrl = e.target?.result as string;
+      setPreview(dataUrl);
+      setImageBase64(dataUrl);
+      setResult(null);
+    };
+    reader.readAsDataURL(file);
+  };
 
-  const toggleVoiceInput = useCallback(() => {
-    const SpeechRecognition =
-      (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-    if (!SpeechRecognition) {
-      toast.error("Speech recognition is not supported in your browser");
-      return;
-    }
-    if (isListening && recognitionRef.current) {
-      recognitionRef.current.stop();
-      setIsListening(false);
-      return;
-    }
-    const recognition = new SpeechRecognition();
-    recognition.continuous = true;
-    recognition.interimResults = true;
-    recognition.lang = "en-IN";
-    recognitionRef.current = recognition;
-    let finalTranscript = description;
-    recognition.onresult = (event: any) => {
-      let interim = "";
-      for (let i = event.resultIndex; i < event.results.length; i++) {
-        if (event.results[i].isFinal) {
-          finalTranscript += (finalTranscript ? " " : "") + event.results[i][0].transcript;
-        } else {
-          interim += event.results[i][0].transcript;
-        }
-      }
-      setDescription(finalTranscript + (interim ? " " + interim : ""));
-    };
-    recognition.onerror = (event: any) => {
-      if (event.error === "network") {
-        toast.error("Voice recognition needs a direct browser tab. Try publishing your app or opening it in a new tab.", { duration: 5000 });
-      } else if (event.error === "not-allowed") {
-        toast.error("Microphone access denied. Please allow microphone in browser settings.");
-      } else {
-        toast.error("Voice error: " + event.error);
-      }
-      setIsListening(false);
-    };
-    recognition.onend = () => setIsListening(false);
-    recognition.start();
-    setIsListening(true);
-    toast.success("Listening... Speak now!");
-  }, [isListening, description]);
+  const onDrop = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    const file = e.dataTransfer.files[0];
+    if (file) handleFile(file);
+  }, []);
 
   const handleAnalyze = async () => {
-    if (!description.trim()) {
-      toast.error("Please describe the craft product");
+    if (!imageBase64) {
+      toast.error("Please upload a craft image first");
       return;
     }
     setAnalyzing(true);
     setResult(null);
     try {
       const { data, error } = await supabase.functions.invoke("craft-detector", {
-        body: { craftDescription: description },
+        body: { imageBase64 },
       });
       if (error) throw error;
       if (data.error) throw new Error(data.error);
@@ -137,66 +84,66 @@ const CraftDetectorPage = () => {
     <DashboardLayout>
       <div className="max-w-4xl mx-auto space-y-8">
         <div>
-          <h1 className="text-2xl font-display font-bold text-foreground">
-            Cultural Craft Detector
-          </h1>
-          <p className="text-muted-foreground mt-1">
-            AI-powered craft identification — discover the type, origin, and cultural history of any handicraft.
-          </p>
+          <h1 className="text-2xl font-display font-bold text-foreground">Cultural Craft Detector</h1>
+          <p className="text-muted-foreground mt-1">Upload a craft photo and AI will identify the craft type, origin region, and cultural history.</p>
         </div>
 
-        {/* Input */}
-        <div className="bg-card rounded-xl p-6 shadow-card border border-border space-y-4">
-          <label className="text-sm font-medium text-foreground">
-            Describe the craft product
-          </label>
-          <div className="relative">
-            <Textarea
-              ref={textareaRef}
-              placeholder="e.g. A blue and white pottery vase with floral patterns, handmade in Jaipur using traditional techniques..."
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              className="pr-12 resize-none overflow-hidden min-h-[80px]"
-              rows={3}
-            />
-            <Button
-              type="button"
-              variant={isListening ? "destructive" : "outline"}
-              size="icon"
-              className="absolute right-2 top-2 h-8 w-8"
-              onClick={toggleVoiceInput}
-              title={isListening ? "Stop listening" : "Describe with voice"}
-            >
-              {isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
-            </Button>
-          </div>
-
-          <Button
-            variant="hero"
-            size="lg"
-            className="w-full gap-2"
-            onClick={handleAnalyze}
-            disabled={analyzing || !description.trim()}
-          >
-            {analyzing ? (
-              <>
-                <Loader2 className="w-4 h-4 animate-spin" /> Analyzing Craft...
-              </>
-            ) : (
-              <>
-                <Search className="w-4 h-4" /> Detect Craft Culture
-              </>
-            )}
-          </Button>
+        {/* Upload area */}
+        <div
+          onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
+          onDragLeave={() => setIsDragging(false)}
+          onDrop={onDrop}
+          className={`relative border-2 border-dashed rounded-xl p-12 text-center transition-colors ${
+            isDragging ? "border-primary bg-primary/5" : "border-border"
+          }`}
+        >
+          {preview ? (
+            <div className="space-y-4">
+              <img src={preview} alt="Craft preview" className="max-h-72 mx-auto rounded-lg object-contain" />
+              <div className="flex gap-3 justify-center">
+                <Button variant="outline" size="sm" onClick={() => { setPreview(null); setImageBase64(null); setResult(null); }}>
+                  Change Image
+                </Button>
+                <Button
+                  variant="hero"
+                  size="sm"
+                  className="gap-2"
+                  onClick={handleAnalyze}
+                  disabled={analyzing}
+                >
+                  {analyzing ? (
+                    <><Loader2 className="w-4 h-4 animate-spin" /> Analyzing...</>
+                  ) : (
+                    <><Search className="w-4 h-4" /> Detect Craft</>
+                  )}
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <label className="cursor-pointer space-y-4 block">
+              <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center mx-auto">
+                <ImagePlus className="w-8 h-8 text-muted-foreground" />
+              </div>
+              <div>
+                <p className="font-medium text-foreground">Drop your craft image here</p>
+                <p className="text-sm text-muted-foreground">or click to browse • JPG, PNG supported</p>
+              </div>
+              <input
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) handleFile(file);
+                }}
+              />
+            </label>
+          )}
         </div>
 
         {/* Results */}
         {result && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="space-y-6"
-          >
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
             {/* Craft Type */}
             <div className="bg-card rounded-xl p-6 shadow-card border border-border space-y-4">
               <div className="flex items-center gap-2 text-primary">
@@ -220,12 +167,7 @@ const CraftDetectorPage = () => {
                   <p className="text-xs text-muted-foreground uppercase tracking-wide">Materials</p>
                   <div className="flex flex-wrap gap-1.5 mt-1">
                     {result.craftType.materials.map((m) => (
-                      <span
-                        key={m}
-                        className="px-2.5 py-0.5 rounded-full bg-primary/10 text-primary text-xs font-medium"
-                      >
-                        {m}
-                      </span>
+                      <span key={m} className="px-2.5 py-0.5 rounded-full bg-primary/10 text-primary text-xs font-medium">{m}</span>
                     ))}
                   </div>
                 </div>
@@ -253,9 +195,9 @@ const CraftDetectorPage = () => {
                 </div>
               </div>
               {result.originRegion.geoTag && (
-                <div className="flex items-center gap-2 mt-2 px-3 py-2 rounded-lg bg-green-50 border border-green-200">
-                  <Shield className="w-4 h-4 text-green-600" />
-                  <span className="text-sm font-medium text-green-700">{result.originRegion.geoTag}</span>
+                <div className="flex items-center gap-2 mt-2 px-3 py-2 rounded-lg bg-primary/5 border border-primary/20">
+                  <Shield className="w-4 h-4 text-primary" />
+                  <span className="text-sm font-medium text-primary">{result.originRegion.geoTag}</span>
                 </div>
               )}
             </div>
@@ -308,7 +250,6 @@ const CraftDetectorPage = () => {
                   ))}
                 </ul>
               </div>
-
               <div className="bg-card rounded-xl p-6 shadow-card border border-border space-y-3">
                 <div className="flex items-center gap-2 text-primary">
                   <Globe className="w-5 h-5" />
