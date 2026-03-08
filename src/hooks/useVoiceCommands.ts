@@ -51,6 +51,11 @@ export const useVoiceCommands = () => {
       action: () => navigate("/dashboard/pricing"),
       description: "Smart Pricing",
     },
+    {
+      keywords: ["detect", "detector", "craft detector", "cultural", "identify", "analyze craft", "origin"],
+      action: () => navigate("/dashboard/craft-detector"),
+      description: "Craft Detector",
+    },
   ];
 
   const matchCommand = useCallback(
