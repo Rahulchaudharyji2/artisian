@@ -16,6 +16,7 @@ import {
   LogOut,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import VoiceAssistantFAB from "@/components/VoiceAssistantFAB";
 import kalaLogo from "@/assets/kala-logo.png";
 
 const navItems = [
@@ -138,6 +139,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
         <main className="flex-1 p-6 lg:p-8 overflow-y-auto">
           {children}
         </main>
+        <VoiceAssistantFAB />
       </div>
     </div>
   );
