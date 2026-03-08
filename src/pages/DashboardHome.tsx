@@ -65,7 +65,7 @@ const DashboardHome = () => {
         {/* Welcome */}
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
           <h1 className="text-2xl md:text-3xl font-display font-bold text-foreground">
-            Welcome, Artisan! 🎨
+            Welcome{artisanName ? `, ${artisanName}` : ", Artisan"}! 🎨
           </h1>
           <p className="text-muted-foreground mt-1">
             Your AI-powered digital manager is ready to help.
