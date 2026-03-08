@@ -13,6 +13,7 @@ import SocialMediaPage from "./pages/SocialMediaPage";
 import MarketDiscoveryPage from "./pages/MarketDiscoveryPage";
 import MyProductsPage from "./pages/MyProductsPage";
 import SmartPricingPage from "./pages/SmartPricingPage";
+import CraftDetectorPage from "./pages/CraftDetectorPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
