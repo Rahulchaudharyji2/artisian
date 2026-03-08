@@ -102,30 +102,47 @@ const MarketDiscoveryPage = () => {
                 <span className="text-sm font-medium">Top Markets</span>
               </div>
               <div className="space-y-3">
-                {analysis.topMarkets.map((market, i) => (
-                  <div key={i} className="p-4 rounded-lg bg-muted/50 space-y-2">
-                    <div className="flex items-center gap-3">
-                      <span className="text-lg font-bold text-primary">{i + 1}</span>
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <span className="font-semibold text-foreground">{market.country}</span>
-                          <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${demandColor(market.demandLevel)}`}>
-                            {market.demandLevel} Demand
-                          </span>
-                          <span className="text-xs text-muted-foreground">{market.estimatedMarketSize}</span>
+                {/* Pin India on top */}
+                {(() => {
+                  const indiaIndex = analysis.topMarkets.findIndex(
+                    (m) => m.country.toLowerCase().includes("india")
+                  );
+                  const sorted = indiaIndex >= 0
+                    ? [analysis.topMarkets[indiaIndex], ...analysis.topMarkets.filter((_, i) => i !== indiaIndex)]
+                    : analysis.topMarkets;
+
+                  return sorted.map((market, displayIndex) => {
+                    const actualRank = analysis.topMarkets.indexOf(market) + 1;
+                    const isIndia = market.country.toLowerCase().includes("india");
+                    return (
+                      <div key={displayIndex} className={`p-4 rounded-lg space-y-2 ${isIndia ? "bg-primary/5 border border-primary/20" : "bg-muted/50"}`}>
+                        <div className="flex items-center gap-3">
+                          <span className="text-lg font-bold text-primary">#{actualRank}</span>
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <span className="font-semibold text-foreground">{market.country}</span>
+                              {isIndia && (
+                                <span className="px-2 py-0.5 rounded-full bg-primary/20 text-primary text-xs font-medium">🇮🇳 Domestic</span>
+                              )}
+                              <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${demandColor(market.demandLevel)}`}>
+                                {market.demandLevel} Demand
+                              </span>
+                              <span className="text-xs text-muted-foreground">{market.estimatedMarketSize}</span>
+                            </div>
+                          </div>
+                        </div>
+                        <p className="text-sm text-muted-foreground ml-8">{market.reason}</p>
+                        <div className="flex gap-2 ml-8 flex-wrap">
+                          {market.bestPlatforms.map((platform) => (
+                            <span key={platform} className="px-2 py-0.5 rounded bg-primary/10 text-primary text-xs font-medium">
+                              {platform}
+                            </span>
+                          ))}
                         </div>
                       </div>
-                    </div>
-                    <p className="text-sm text-muted-foreground ml-8">{market.reason}</p>
-                    <div className="flex gap-2 ml-8 flex-wrap">
-                      {market.bestPlatforms.map((platform) => (
-                        <span key={platform} className="px-2 py-0.5 rounded bg-primary/10 text-primary text-xs font-medium">
-                          {platform}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                ))}
+                    );
+                  });
+                })()}
               </div>
             </div>
 
