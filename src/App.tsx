@@ -12,6 +12,7 @@ import StoryGeneratorPage from "./pages/StoryGeneratorPage";
 import SocialMediaPage from "./pages/SocialMediaPage";
 import MarketDiscoveryPage from "./pages/MarketDiscoveryPage";
 import MyProductsPage from "./pages/MyProductsPage";
+import SmartPricingPage from "./pages/SmartPricingPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -32,6 +33,7 @@ const App = () => (
           <Route path="/dashboard/social" element={<SocialMediaPage />} />
           <Route path="/dashboard/markets" element={<MarketDiscoveryPage />} />
           <Route path="/dashboard/products" element={<MyProductsPage />} />
+          <Route path="/dashboard/pricing" element={<SmartPricingPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
