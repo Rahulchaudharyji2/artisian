@@ -28,7 +28,7 @@ serve(async (req) => {
       textParts.push(`Here is the artisan's story: "${story}".`);
     }
     if (image) {
-      textParts.push("I've also attached an image of the craft. Please analyze it to enrich the brand content with visual details about the craftsmanship, materials, and artistry visible in the image.");
+      textParts.push("I've also attached a personal photo — it could be of the artisan, their family, or their workspace. Please weave details from the photo into the brand story to make it more personal and authentic.");
     }
     textParts.push("Generate brand content from this.");
     
@@ -45,7 +45,7 @@ serve(async (req) => {
         messages: [
           {
             role: "system",
-            content: `You are an expert brand storyteller for Indian artisan crafts. Convert the artisan's personal craft story and/or craft image into professional brand content. If an image is provided, describe the visual elements and weave them into the narrative. You must call the create_brand_content function.`
+            content: `You are an expert brand storyteller for Indian artisan crafts. Convert the artisan's personal craft story and/or personal photo into professional brand content. If a photo is provided, describe who or what you see and weave those personal details into an authentic, heartfelt narrative. You must call the create_brand_content function.`
           },
           {
             role: "user",
