@@ -78,7 +78,11 @@ const MyProductsPage = () => {
         ) : (
           <div className="grid gap-4 sm:grid-cols-2">
             {products.map((p) => (
-              <div key={p.id} className="bg-card border border-border rounded-xl overflow-hidden">
+              <div
+                key={p.id}
+                onClick={() => navigate(`/dashboard/products/${p.id}`)}
+                className="bg-card border border-border rounded-xl overflow-hidden cursor-pointer hover:shadow-md transition-shadow"
+              >
                 {p.image_url ? (
                   <img src={p.image_url} alt={p.title} className="w-full h-48 object-cover" />
                 ) : (
