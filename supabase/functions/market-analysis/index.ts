@@ -32,7 +32,7 @@ serve(async (req) => {
 - Product Category: ${productCategory}
 - Craft Type: ${craftType}
 
-IMPORTANT: The first market in topMarkets must always be India (domestic market) with its specific demand analysis. Then list 4 more international countries. Include specific countries with detailed reasons, real marketplace recommendations, seasonal trends, competition analysis, and actionable marketing strategies. Be specific and data-driven — avoid generic advice.`
+List the top 6 countries ranked by market potential. India MUST be included with its actual ranking position (it may or may not be #1 — rank it honestly based on real demand). Include specific countries with detailed reasons, real marketplace recommendations, seasonal trends, competition analysis, and actionable marketing strategies. Be specific and data-driven — avoid generic advice.`
           }
         ],
         tools: [
