@@ -234,12 +234,27 @@ const UploadProductPage = () => {
         {/* Description input */}
         <div className="space-y-2">
           <label className="text-sm font-medium text-foreground">Describe your craft product</label>
-          <Input
-            placeholder="e.g. Handmade terracotta clay pot with traditional firing patterns"
-            value={imageDescription}
-            onChange={(e) => setImageDescription(e.target.value)}
-          />
-          <p className="text-xs text-muted-foreground">Describe what's in the image so AI can generate an accurate listing.</p>
+          <div className="relative">
+            <Textarea
+              ref={textareaRef}
+              placeholder="e.g. Handmade terracotta clay pot with traditional firing patterns. Made using local red clay with intricate hand-painted motifs..."
+              value={imageDescription}
+              onChange={(e) => setImageDescription(e.target.value)}
+              className="pr-12 resize-none overflow-hidden min-h-[80px]"
+              rows={2}
+            />
+            <Button
+              type="button"
+              variant={isListening ? "destructive" : "outline"}
+              size="icon"
+              className="absolute right-2 top-2 h-8 w-8"
+              onClick={toggleVoiceInput}
+              title={isListening ? "Stop listening" : "Describe with voice"}
+            >
+              {isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+            </Button>
+          </div>
+          <p className="text-xs text-muted-foreground">Describe what's in the image so AI can generate an accurate listing. You can also use the mic to speak your description.</p>
         </div>
 
         {/* Generate button */}
