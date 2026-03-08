@@ -15,6 +15,8 @@ const UploadProductPage = () => {
   const [publishing, setPublishing] = useState(false);
   const [imageDescription, setImageDescription] = useState("");
   const [manualPrice, setManualPrice] = useState(500);
+  const [priceRange, setPriceRange] = useState<{ min: number; max: number }>({ min: 50, max: 50000 });
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [listing, setListing] = useState<{
     title: string;
     description: string;
