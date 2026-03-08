@@ -100,8 +100,8 @@ const StoryGeneratorPage = () => {
             <div className="flex items-center gap-4">
               <img src={imagePreview} alt="Craft preview" className="h-24 w-24 rounded-lg object-cover" />
               <div className="text-left flex-1">
-                <p className="text-sm font-medium text-foreground">Image attached</p>
-                <p className="text-xs text-muted-foreground">AI will analyze this image to enrich your brand story</p>
+                <p className="text-sm font-medium text-foreground">Photo attached</p>
+                <p className="text-xs text-muted-foreground">AI will use this to personalize your brand story</p>
               </div>
               <Button
                 variant="ghost"

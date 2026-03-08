@@ -45,7 +45,7 @@ serve(async (req) => {
         messages: [
           {
             role: "system",
-            content: `You are an expert brand storyteller for Indian artisan crafts. Convert the artisan's personal craft story and/or craft image into professional brand content. If an image is provided, describe the visual elements and weave them into the narrative. You must call the create_brand_content function.`
+            content: `You are an expert brand storyteller for Indian artisan crafts. Convert the artisan's personal craft story and/or personal photo into professional brand content. If a photo is provided, describe who or what you see and weave those personal details into an authentic, heartfelt narrative. You must call the create_brand_content function.`
           },
           {
             role: "user",
