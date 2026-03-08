@@ -9,6 +9,8 @@ import SignupPage from "./pages/SignupPage";
 import DashboardHome from "./pages/DashboardHome";
 import UploadProductPage from "./pages/UploadProductPage";
 import StoryGeneratorPage from "./pages/StoryGeneratorPage";
+import SocialMediaPage from "./pages/SocialMediaPage";
+import MarketDiscoveryPage from "./pages/MarketDiscoveryPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -26,6 +28,8 @@ const App = () => (
           <Route path="/dashboard" element={<DashboardHome />} />
           <Route path="/dashboard/upload" element={<UploadProductPage />} />
           <Route path="/dashboard/story" element={<StoryGeneratorPage />} />
+          <Route path="/dashboard/social" element={<SocialMediaPage />} />
+          <Route path="/dashboard/markets" element={<MarketDiscoveryPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
