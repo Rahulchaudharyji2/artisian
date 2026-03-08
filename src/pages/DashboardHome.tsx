@@ -1,20 +1,15 @@
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Upload, Package, BookOpen, Share2, Globe, TrendingUp, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import DashboardLayout from "@/components/DashboardLayout";
+import { supabase } from "@/integrations/supabase/client";
 
 const quickActions = [
   { icon: Upload, label: "Upload Product", desc: "Create AI listing from photo", path: "/dashboard/upload", color: "gradient-hero" },
   { icon: BookOpen, label: "Generate Story", desc: "Tell your craft story", path: "/dashboard/story", color: "gradient-indigo" },
   { icon: Share2, label: "Social Content", desc: "Marketing posts & captions", path: "/dashboard/social", color: "gradient-hero" },
   { icon: Globe, label: "Market Insights", desc: "Find global buyers", path: "/dashboard/markets", color: "gradient-indigo" },
-];
-
-const stats = [
-  { label: "Products", value: "0", icon: Package },
-  { label: "AI Listings", value: "0", icon: BookOpen },
-  { label: "Markets Reached", value: "0", icon: Globe },
-  { label: "Price Insights", value: "0", icon: TrendingUp },
 ];
 
 const fadeUp = {
@@ -26,6 +21,38 @@ const fadeUp = {
 };
 
 const DashboardHome = () => {
+  const [productCount, setProductCount] = useState(0);
+  const [listingCount, setListingCount] = useState(0);
+  const [categoryCount, setCategoryCount] = useState(0);
+  const [priceCount, setPriceCount] = useState(0);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      const { data: products } = await supabase.from("products").select("id, description, category, price");
+      if (products) {
+        setProductCount(products.length);
+        setListingCount(products.filter(p => p.description && p.description.length > 50).length);
+        setCategoryCount(new Set(products.map(p => p.category)).size);
+        setPriceCount(products.filter(p => p.price && parseFloat(p.price) > 0).length);
+      }
+    };
+    fetchStats();
+
+    const channel = supabase
+      .channel("products-stats")
+      .on("postgres_changes", { event: "*", schema: "public", table: "products" }, () => fetchStats())
+      .subscribe();
+
+    return () => { supabase.removeChannel(channel); };
+  }, []);
+
+  const stats = [
+    { label: "Products", value: productCount.toString(), icon: Package },
+    { label: "AI Listings", value: listingCount.toString(), icon: BookOpen },
+    { label: "Categories", value: categoryCount.toString(), icon: Globe },
+    { label: "Priced Items", value: priceCount.toString(), icon: TrendingUp },
+  ];
+
   return (
     <DashboardLayout>
       <div className="space-y-8">
