@@ -9,30 +9,9 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { story, image } = await req.json();
+    const { story } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
-
-    // Build user message content - support text, image, or both
-    const userContent: any[] = [];
-    
-    if (image) {
-      userContent.push({
-        type: "image_url",
-        image_url: { url: `data:image/jpeg;base64,${image}` }
-      });
-    }
-    
-    const textParts: string[] = [];
-    if (story?.trim()) {
-      textParts.push(`Here is the artisan's story: "${story}".`);
-    }
-    if (image) {
-      textParts.push("I've also attached a personal photo — it could be of the artisan, their family, or their workspace. Please weave details from the photo into the brand story to make it more personal and authentic.");
-    }
-    textParts.push("Generate brand content from this.");
-    
-    userContent.push({ type: "text", text: textParts.join(" ") });
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -41,15 +20,15 @@ serve(async (req) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
+        model: "google/gemini-3-flash-preview",
         messages: [
           {
             role: "system",
-            content: `You are an expert brand storyteller for Indian artisan crafts. Convert the artisan's personal craft story and/or personal photo into professional brand content. If a photo is provided, describe who or what you see and weave those personal details into an authentic, heartfelt narrative. You must call the create_brand_content function.`
+            content: `You are an expert brand storyteller for Indian artisan crafts. Convert the artisan's personal craft story into rich, detailed, professional brand content. Write long-form, emotionally compelling narratives that capture the heritage, passion, and craftsmanship. Be vivid and descriptive. You must call the create_brand_content function.`
           },
           {
             role: "user",
-            content: userContent
+            content: `Here is the artisan's story: "${story}". Generate detailed, long-form brand content from this. Make each section rich with storytelling, sensory details, and emotional depth.`
           }
         ],
         tools: [
