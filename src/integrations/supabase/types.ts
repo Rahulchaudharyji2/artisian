@@ -25,6 +25,7 @@ export type Database = {
           price: string
           tags: string[]
           title: string
+          user_id: string | null
         }
         Insert: {
           category: string
@@ -36,6 +37,7 @@ export type Database = {
           price: string
           tags?: string[]
           title: string
+          user_id?: string | null
         }
         Update: {
           category?: string
@@ -47,6 +49,40 @@ export type Database = {
           price?: string
           tags?: string[]
           title?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          craft_type: string
+          created_at: string
+          id: string
+          location: string
+          name: string
+          story: string
+          updated_at: string
+          years_of_experience: number
+        }
+        Insert: {
+          craft_type?: string
+          created_at?: string
+          id: string
+          location?: string
+          name?: string
+          story?: string
+          updated_at?: string
+          years_of_experience?: number
+        }
+        Update: {
+          craft_type?: string
+          created_at?: string
+          id?: string
+          location?: string
+          name?: string
+          story?: string
+          updated_at?: string
+          years_of_experience?: number
         }
         Relationships: []
       }
