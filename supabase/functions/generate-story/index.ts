@@ -9,9 +9,30 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { story } = await req.json();
+    const { story, image } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
+
+    // Build user message content - support text, image, or both
+    const userContent: any[] = [];
+    
+    if (image) {
+      userContent.push({
+        type: "image_url",
+        image_url: { url: `data:image/jpeg;base64,${image}` }
+      });
+    }
+    
+    const textParts: string[] = [];
+    if (story?.trim()) {
+      textParts.push(`Here is the artisan's story: "${story}".`);
+    }
+    if (image) {
+      textParts.push("I've also attached an image of the craft. Please analyze it to enrich the brand content with visual details about the craftsmanship, materials, and artistry visible in the image.");
+    }
+    textParts.push("Generate brand content from this.");
+    
+    userContent.push({ type: "text", text: textParts.join(" ") });
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -20,15 +41,15 @@ serve(async (req) => {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-3-flash-preview",
+        model: "google/gemini-2.5-flash",
         messages: [
           {
             role: "system",
-            content: `You are an expert brand storyteller for Indian artisan crafts. Convert the artisan's personal craft story into professional brand content. You must call the create_brand_content function.`
+            content: `You are an expert brand storyteller for Indian artisan crafts. Convert the artisan's personal craft story and/or craft image into professional brand content. If an image is provided, describe the visual elements and weave them into the narrative. You must call the create_brand_content function.`
           },
           {
             role: "user",
-            content: `Here is the artisan's story: "${story}". Generate brand content from this.`
+            content: userContent
           }
         ],
         tools: [
@@ -36,7 +57,7 @@ serve(async (req) => {
             type: "function",
             function: {
               name: "create_brand_content",
-              description: "Generate brand storytelling content from an artisan's story",
+              description: "Generate brand storytelling content from an artisan's story and/or craft image",
               parameters: {
                 type: "object",
                 properties: {
