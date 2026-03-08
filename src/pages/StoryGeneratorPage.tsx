@@ -118,8 +118,8 @@ const StoryGeneratorPage = () => {
                 <ImagePlus className="w-6 h-6 text-muted-foreground" />
               </div>
               <div>
-                <p className="text-sm font-medium text-foreground">Upload a craft image <span className="text-muted-foreground">(optional)</span></p>
-                <p className="text-xs text-muted-foreground">Drop an image or click to browse</p>
+                <p className="text-sm font-medium text-foreground">Upload a photo <span className="text-muted-foreground">(optional)</span></p>
+                <p className="text-xs text-muted-foreground">Share a photo of yourself, your family, or your workspace to personalize the story</p>
               </div>
               <input
                 type="file"
