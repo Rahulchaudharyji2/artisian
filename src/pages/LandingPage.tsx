@@ -81,12 +81,20 @@ const LandingPage = () => {
             <a href="#stories" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Stories</a>
           </div>
           <div className="flex items-center gap-3">
-            <Link to="/login">
-              <Button variant="ghost" size="sm">Log In</Button>
-            </Link>
-            <Link to="/signup">
-              <Button variant="hero" size="sm">Get Started</Button>
-            </Link>
+            {session ? (
+              <Link to="/dashboard">
+                <Button variant="hero" size="sm">Dashboard</Button>
+              </Link>
+            ) : (
+              <>
+                <Link to="/login">
+                  <Button variant="ghost" size="sm">Log In</Button>
+                </Link>
+                <Link to="/signup">
+                  <Button variant="hero" size="sm">Get Started</Button>
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </nav>
