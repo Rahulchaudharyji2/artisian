@@ -28,7 +28,7 @@ serve(async (req) => {
       textParts.push(`Here is the artisan's story: "${story}".`);
     }
     if (image) {
-      textParts.push("I've also attached an image of the craft. Please analyze it to enrich the brand content with visual details about the craftsmanship, materials, and artistry visible in the image.");
+      textParts.push("I've also attached a personal photo — it could be of the artisan, their family, or their workspace. Please weave details from the photo into the brand story to make it more personal and authentic.");
     }
     textParts.push("Generate brand content from this.");
     
