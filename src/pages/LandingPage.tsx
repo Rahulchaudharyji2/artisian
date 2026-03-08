@@ -216,7 +216,8 @@ const LandingPage = () => {
                 viewport={{ once: true }}
                 variants={fadeUp}
                 custom={i}
-                className="group bg-background rounded-xl p-6 shadow-card border border-border hover:shadow-warm transition-shadow duration-300"
+                onClick={() => handleFeatureClick(f.path)}
+                className="group bg-background rounded-xl p-6 shadow-card border border-border hover:shadow-warm transition-shadow duration-300 cursor-pointer"
               >
                 <div className="w-12 h-12 rounded-lg gradient-hero flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                   <f.icon className="w-6 h-6 text-primary-foreground" />
