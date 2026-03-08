@@ -74,7 +74,7 @@ const UploadProductPage = () => {
     recognition.onerror = (event: any) => {
       console.error("Speech recognition error:", event.error);
       if (event.error === "network") {
-        toast.error("Voice input requires a stable internet connection. Please check your network and try again, or type your description instead.");
+        toast.error("Voice recognition needs a direct browser tab. Try publishing your app or opening it in a new tab, or type your description instead.", { duration: 5000 });
       } else if (event.error === "not-allowed") {
         toast.error("Microphone access denied. Please allow microphone permission in your browser settings.");
       } else {
