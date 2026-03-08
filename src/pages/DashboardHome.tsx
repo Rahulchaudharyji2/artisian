@@ -29,13 +29,18 @@ const DashboardHome = () => {
   const [artisanName, setArtisanName] = useState("");
 
   useEffect(() => {
+    if (!user) return;
+    // Fetch profile name
+    supabase.from("profiles").select("name").eq("id", user.id).single().then(({ data }) => {
+      if (data?.name) setArtisanName(data.name);
+    });
+
     const fetchStats = async () => {
-      const { data: products } = await supabase.from("products").select("id, description, category, price");
+      const { data: products } = await supabase.from("products").select("id, description, category");
       if (products) {
         setProductCount(products.length);
         setListingCount(products.filter(p => p.description && p.description.length > 50).length);
         setCategoryCount(new Set(products.map(p => p.category)).size);
-        setPriceCount(products.filter(p => p.price && parseFloat(p.price) > 0).length);
       }
     };
     fetchStats();
@@ -46,7 +51,7 @@ const DashboardHome = () => {
       .subscribe();
 
     return () => { supabase.removeChannel(channel); };
-  }, []);
+  }, [user]);
 
   const stats = [
     { label: "Products", value: productCount.toString(), icon: Package },
