@@ -9,11 +9,12 @@ import {
   Share2,
   Globe,
   TrendingUp,
-  Mic,
   User,
   Menu,
   X,
   LogOut,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import VoiceAssistantFAB from "@/components/VoiceAssistantFAB";
@@ -27,48 +28,71 @@ const navItems = [
   { icon: Share2, label: "Social Media", path: "/dashboard/social" },
   { icon: Globe, label: "Market Discovery", path: "/dashboard/markets" },
   { icon: TrendingUp, label: "Smart Pricing", path: "/dashboard/pricing" },
-  { icon: Mic, label: "Voice Assistant", path: "/dashboard/voice" },
   { icon: User, label: "Profile", path: "/dashboard/profile" },
 ];
 
 const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [collapsed, setCollapsed] = useState(false);
   const location = useLocation();
 
   return (
     <div className="min-h-screen bg-background flex">
       {/* Desktop sidebar */}
-      <aside className="hidden lg:flex flex-col w-64 gradient-indigo">
-        <div className="p-6 flex items-center gap-3">
-          <img src={kalaLogo} alt="KALA AI" className="h-9 w-9" />
-          <span className="font-display text-lg font-bold text-sidebar-foreground">KALA AI</span>
+      <aside
+        className={`hidden lg:flex flex-col gradient-indigo transition-all duration-300 relative ${
+          collapsed ? "w-[72px]" : "w-64"
+        }`}
+      >
+        <div className={`p-6 flex items-center ${collapsed ? "justify-center" : "gap-3"}`}>
+          <img src={kalaLogo} alt="KALA AI" className="h-9 w-9 flex-shrink-0" />
+          {!collapsed && (
+            <span className="font-display text-lg font-bold text-sidebar-foreground">KALA AI</span>
+          )}
         </div>
-        <nav className="flex-1 px-3 space-y-1">
+        <nav className="flex-1 px-2 space-y-1">
           {navItems.map((item) => {
             const active = location.pathname === item.path;
             return (
               <Link
                 key={item.path}
                 to={item.path}
+                title={collapsed ? item.label : undefined}
                 className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors ${
+                  collapsed ? "justify-center" : ""
+                } ${
                   active
                     ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium"
                     : "text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent/50"
                 }`}
               >
-                <item.icon className="w-4 h-4" />
-                {item.label}
+                <item.icon className="w-4 h-4 flex-shrink-0" />
+                {!collapsed && item.label}
               </Link>
             );
           })}
         </nav>
-        <div className="p-4">
-          <Link to="/">
-            <Button variant="ghost" className="w-full justify-start gap-2 text-sidebar-foreground/70 hover:text-sidebar-foreground">
-              <LogOut className="w-4 h-4" /> Log Out
+        <div className="p-3 space-y-1">
+          <Link to="/" title={collapsed ? "Log Out" : undefined}>
+            <Button
+              variant="ghost"
+              className={`w-full gap-2 text-sidebar-foreground/70 hover:text-sidebar-foreground ${
+                collapsed ? "justify-center px-0" : "justify-start"
+              }`}
+            >
+              <LogOut className="w-4 h-4 flex-shrink-0" />
+              {!collapsed && "Log Out"}
             </Button>
           </Link>
         </div>
+
+        {/* Collapse toggle */}
+        <button
+          onClick={() => setCollapsed(!collapsed)}
+          className="absolute -right-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-primary text-primary-foreground flex items-center justify-center shadow-md hover:bg-primary/90 transition-colors"
+        >
+          {collapsed ? <ChevronRight className="w-3.5 h-3.5" /> : <ChevronLeft className="w-3.5 h-3.5" />}
+        </button>
       </aside>
 
       {/* Mobile sidebar */}
@@ -125,7 +149,6 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
 
       {/* Main content */}
       <div className="flex-1 flex flex-col">
-        {/* Mobile header */}
         <header className="lg:hidden flex items-center justify-between p-4 border-b border-border bg-background">
           <button onClick={() => setSidebarOpen(true)}>
             <Menu className="w-6 h-6 text-foreground" />
