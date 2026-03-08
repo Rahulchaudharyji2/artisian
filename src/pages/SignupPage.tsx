@@ -28,7 +28,7 @@ const SignupPage = () => {
     if (error) {
       toast.error(error.message);
     } else {
-      toast.success("Check your email to confirm your account, then log in.");
+      toast.success("Signup successful! Please sign in.");
       navigate("/login");
     }
   };
