@@ -11,6 +11,7 @@ import UploadProductPage from "./pages/UploadProductPage";
 import StoryGeneratorPage from "./pages/StoryGeneratorPage";
 import SocialMediaPage from "./pages/SocialMediaPage";
 import MarketDiscoveryPage from "./pages/MarketDiscoveryPage";
+import MyProductsPage from "./pages/MyProductsPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
