@@ -108,7 +108,7 @@ const MyProductsPage = () => {
                       </span>
                     ))}
                   </div>
-                  <div className="pt-2">
+                  <div className="pt-2" onClick={(e) => e.stopPropagation()}>
                     <AlertDialog>
                       <AlertDialogTrigger asChild>
                         <Button variant="outline" size="sm" className="gap-1.5 text-destructive hover:text-destructive">
