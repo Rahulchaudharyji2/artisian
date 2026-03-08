@@ -24,11 +24,15 @@ serve(async (req) => {
         messages: [
           {
             role: "system",
-            content: `You are a global market analyst specializing in handmade crafts and artisan goods. Analyze market potential for Indian craft products. Call the create_market_analysis function.`
+            content: `You are a senior global market research analyst specializing in handmade crafts, artisan goods, and the global handicraft trade. Provide deeply researched, specific, data-driven market intelligence for Indian artisan products entering international markets. Include real platform names, specific cultural trends, seasonal demand patterns, and actionable strategies. Be thorough and detailed in every field. You must call the create_market_analysis function.`
           },
           {
             role: "user",
-            content: `Analyze global market potential for: Category: ${productCategory}, Craft Type: ${craftType}`
+            content: `Provide a comprehensive global market analysis for an Indian artisan selling:
+- Product Category: ${productCategory}
+- Craft Type: ${craftType}
+
+Include specific countries with detailed reasons, real marketplace recommendations, seasonal trends, competition analysis, and actionable marketing strategies. Be specific and data-driven — avoid generic advice.`
           }
         ],
         tools: [
@@ -36,7 +40,7 @@ serve(async (req) => {
             type: "function",
             function: {
               name: "create_market_analysis",
-              description: "Generate global market analysis for an artisan craft category",
+              description: "Generate comprehensive global market analysis for an artisan craft",
               parameters: {
                 type: "object",
                 properties: {
@@ -45,19 +49,59 @@ serve(async (req) => {
                     items: {
                       type: "object",
                       properties: {
-                        country: { type: "string" },
-                        reason: { type: "string" },
-                        demandLevel: { type: "string", enum: ["High", "Medium", "Low"] }
+                        country: { type: "string", description: "Country name" },
+                        reason: { type: "string", description: "Detailed reason why this market is ideal (2-3 sentences with specific cultural/economic factors)" },
+                        demandLevel: { type: "string", enum: ["High", "Medium", "Low"] },
+                        estimatedMarketSize: { type: "string", description: "Estimated market size or demand indicator e.g. '$2.3B handmade goods market'" },
+                        bestPlatforms: { type: "array", items: { type: "string" }, description: "2-3 best selling platforms for this country e.g. Etsy, Amazon Handmade, local marketplaces" }
                       },
-                      required: ["country", "reason", "demandLevel"]
+                      required: ["country", "reason", "demandLevel", "estimatedMarketSize", "bestPlatforms"],
+                      additionalProperties: false
                     },
-                    description: "Top 5 countries to sell this craft"
+                    description: "Top 5 countries to sell this craft with detailed analysis"
                   },
-                  trendingKeywords: { type: "array", items: { type: "string" }, description: "8-10 trending search keywords" },
-                  buyerPersona: { type: "string", description: "Ideal buyer persona description" },
-                  pricingRange: { type: "string", description: "Recommended international pricing range in USD" }
+                  trendingKeywords: {
+                    type: "array",
+                    items: { type: "string" },
+                    description: "10-15 trending search keywords buyers use to find this type of product on marketplaces"
+                  },
+                  buyerPersona: {
+                    type: "string",
+                    description: "Detailed ideal buyer persona (at least 80 words) including demographics, lifestyle, shopping behavior, values, and what motivates their purchase"
+                  },
+                  pricingRange: {
+                    type: "string",
+                    description: "Recommended international pricing range in USD with tier breakdown (e.g. entry, mid, premium)"
+                  },
+                  seasonalTrends: {
+                    type: "array",
+                    items: {
+                      type: "object",
+                      properties: {
+                        season: { type: "string", description: "Season or event name e.g. 'Holiday Season', 'Diwali', 'Spring Home Refresh'" },
+                        months: { type: "string", description: "Month range e.g. 'Oct-Dec'" },
+                        insight: { type: "string", description: "Why demand peaks during this period" }
+                      },
+                      required: ["season", "months", "insight"],
+                      additionalProperties: false
+                    },
+                    description: "4-6 seasonal demand trends throughout the year"
+                  },
+                  competitorInsights: {
+                    type: "string",
+                    description: "Analysis of competitor landscape (at least 60 words) — who the main competitors are, their strengths/weaknesses, and how this artisan can differentiate"
+                  },
+                  marketingTips: {
+                    type: "array",
+                    items: { type: "string" },
+                    description: "5-7 specific, actionable marketing tips tailored to this craft type for international sales"
+                  },
+                  exportReadiness: {
+                    type: "string",
+                    description: "Brief overview (40-60 words) of export considerations: packaging, shipping, certifications, or customs tips relevant to this product"
+                  }
                 },
-                required: ["topMarkets", "trendingKeywords", "buyerPersona", "pricingRange"],
+                required: ["topMarkets", "trendingKeywords", "buyerPersona", "pricingRange", "seasonalTrends", "competitorInsights", "marketingTips", "exportReadiness"],
                 additionalProperties: false
               }
             }
