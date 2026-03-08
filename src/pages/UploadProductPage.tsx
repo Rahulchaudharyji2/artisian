@@ -1,8 +1,9 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Upload, ImagePlus, Sparkles, Loader2, Check } from "lucide-react";
+import { Upload, ImagePlus, Sparkles, Loader2, Check, Mic, MicOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Slider } from "@/components/ui/slider";
 import DashboardLayout from "@/components/DashboardLayout";
 import { supabase } from "@/integrations/supabase/client";
@@ -17,6 +18,9 @@ const UploadProductPage = () => {
   const [manualPrice, setManualPrice] = useState(500);
   const [priceRange, setPriceRange] = useState<{ min: number; max: number }>({ min: 50, max: 50000 });
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [isListening, setIsListening] = useState(false);
+  const recognitionRef = useRef<any>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [listing, setListing] = useState<{
     title: string;
     description: string;
@@ -24,6 +28,63 @@ const UploadProductPage = () => {
     tags: string[];
     price: string;
   } | null>(null);
+
+  // Auto-resize textarea
+  useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = "auto";
+      textareaRef.current.style.height = textareaRef.current.scrollHeight + "px";
+    }
+  }, [imageDescription]);
+
+  // Voice input using Web Speech API
+  const toggleVoiceInput = useCallback(() => {
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      toast.error("Speech recognition is not supported in your browser");
+      return;
+    }
+
+    if (isListening && recognitionRef.current) {
+      recognitionRef.current.stop();
+      setIsListening(false);
+      return;
+    }
+
+    const recognition = new SpeechRecognition();
+    recognition.continuous = true;
+    recognition.interimResults = true;
+    recognition.lang = "en-IN";
+    recognitionRef.current = recognition;
+
+    let finalTranscript = imageDescription;
+
+    recognition.onresult = (event: any) => {
+      let interim = "";
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        if (event.results[i].isFinal) {
+          finalTranscript += (finalTranscript ? " " : "") + event.results[i][0].transcript;
+        } else {
+          interim += event.results[i][0].transcript;
+        }
+      }
+      setImageDescription(finalTranscript + (interim ? " " + interim : ""));
+    };
+
+    recognition.onerror = (event: any) => {
+      console.error("Speech recognition error:", event.error);
+      toast.error("Voice input error: " + event.error);
+      setIsListening(false);
+    };
+
+    recognition.onend = () => {
+      setIsListening(false);
+    };
+
+    recognition.start();
+    setIsListening(true);
+    toast.success("Listening... Speak now!");
+  }, [isListening, imageDescription]);
 
   const handleFile = (file: File) => {
     if (!file.type.startsWith("image/")) return;
@@ -173,12 +234,27 @@ const UploadProductPage = () => {
         {/* Description input */}
         <div className="space-y-2">
           <label className="text-sm font-medium text-foreground">Describe your craft product</label>
-          <Input
-            placeholder="e.g. Handmade terracotta clay pot with traditional firing patterns"
-            value={imageDescription}
-            onChange={(e) => setImageDescription(e.target.value)}
-          />
-          <p className="text-xs text-muted-foreground">Describe what's in the image so AI can generate an accurate listing.</p>
+          <div className="relative">
+            <Textarea
+              ref={textareaRef}
+              placeholder="e.g. Handmade terracotta clay pot with traditional firing patterns. Made using local red clay with intricate hand-painted motifs..."
+              value={imageDescription}
+              onChange={(e) => setImageDescription(e.target.value)}
+              className="pr-12 resize-none overflow-hidden min-h-[80px]"
+              rows={2}
+            />
+            <Button
+              type="button"
+              variant={isListening ? "destructive" : "outline"}
+              size="icon"
+              className="absolute right-2 top-2 h-8 w-8"
+              onClick={toggleVoiceInput}
+              title={isListening ? "Stop listening" : "Describe with voice"}
+            >
+              {isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+            </Button>
+          </div>
+          <p className="text-xs text-muted-foreground">Describe what's in the image so AI can generate an accurate listing. You can also use the mic to speak your description.</p>
         </div>
 
         {/* Generate button */}
