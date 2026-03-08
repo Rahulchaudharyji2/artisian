@@ -32,18 +32,24 @@ interface Product {
 
 const MyProductsPage = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [deleting, setDeleting] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchProducts = async () => {
-      const { data, error } = await (supabase.from as any)("products").select("*").order("created_at", { ascending: false });
+      if (!user) return;
+      const { data, error } = await supabase
+        .from("products")
+        .select("*")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false });
       if (!error && data) setProducts(data);
       setLoading(false);
     };
     fetchProducts();
-  }, []);
+  }, [user]);
 
   const handleDelete = async (id: string) => {
     setDeleting(id);
