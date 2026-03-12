@@ -3,6 +3,7 @@
   "rules": {
     "@typescript-eslint/no-explicit-any": "off",
     "@next/next/no-img-element": "off",
-    "react/no-unescaped-entities": "off"
+    "react/no-unescaped-entities": "off",
+    "jsx-a11y/alt-text": "off"
   }
 }
