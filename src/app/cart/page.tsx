@@ -5,6 +5,7 @@ import { ArrowLeft, ShoppingBag, Trash2, Plus, Minus, Sparkles, Package } from '
 import { useRouter } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
 import BottomNav from '@/components/BottomNav';
+import Sidebar from '@/components/Sidebar';
 import Link from 'next/link';
 
 const FREE_SHIPPING_THRESHOLD = 999;
@@ -17,8 +18,14 @@ export default function CartPage() {
     const grandTotal = cartTotal + shipping;
 
     return (
-        <div className="min-h-screen bg-stone-50 pb-28 md:pb-0">
-            <div className="max-w-2xl mx-auto bg-white min-h-screen border-x border-stone-200 shadow-sm">
+        <div className="flex w-full min-h-screen bg-stone-50">
+            {/* Left Sidebar (Desktop) */}
+            <div className="hidden md:block">
+                <Sidebar />
+            </div>
+
+            {/* Main content */}
+            <div className="flex-1 max-w-2xl mx-auto w-full pb-28 md:pb-0 border-r border-stone-200 min-h-screen">
                 {/* Header */}
                 <div className="sticky top-0 z-40 bg-white/80 backdrop-blur-xl px-5 py-4 border-b border-stone-100 flex items-center justify-between">
                     <div className="flex items-center gap-3">

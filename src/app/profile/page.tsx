@@ -7,6 +7,7 @@ import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import BottomNav from '@/components/BottomNav';
 import FeedCard from '@/components/FeedCard';
+import Sidebar from '@/components/Sidebar';
 
 export default function Profile() {
     const { user, logout, updateUser } = useAuth();
@@ -140,9 +141,15 @@ export default function Profile() {
     if (!profileData) return null;
 
     return (
-        <div className="flex w-full min-h-screen bg-stone-50 selection:bg-qala-gold/30 pb-24 md:pb-0">
+        <div className="flex w-full min-h-screen bg-stone-50 selection:bg-qala-gold/30">
+            {/* Left Sidebar (Desktop) */}
+            <div className="hidden md:block">
+                <Sidebar />
+            </div>
+
             {/* Desktop Center Container */}
-            <div className="flex-1 max-w-3xl mx-auto w-full min-h-screen overflow-x-hidden relative bg-white border-x border-stone-200 shadow-sm">
+            <div className="flex-1 pb-24 md:pb-0">
+            <div className="max-w-3xl mx-auto w-full min-h-screen overflow-x-hidden relative bg-white border-x border-stone-200 shadow-sm">
                 
                 {/* Header Navbar */}
                 <div className="sticky top-0 bg-white/80 backdrop-blur-xl z-40 px-6 py-4 border-b border-stone-100 flex justify-between items-center transition-all">
@@ -394,6 +401,7 @@ export default function Profile() {
                     </div>
                 )}
             </div>
+        </div>
 
             {/* Bottom Nav (Mobile) */}
             <div className="md:hidden">

@@ -6,6 +6,7 @@ import { ArrowLeft, Heart, ShoppingBag, ChevronLeft, ChevronRight, MapPin, Spark
 import { useRouter } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
 import BottomNav from '@/components/BottomNav';
+import Sidebar from '@/components/Sidebar';
 
 export default function PostDetail({ params }: { params: { id: string } }) {
     const router = useRouter();
@@ -83,7 +84,14 @@ export default function PostDetail({ params }: { params: { id: string } }) {
     }
 
     return (
-        <div className="min-h-screen bg-stone-50 pb-24 md:pb-0">
+        <div className="flex w-full min-h-screen bg-stone-50">
+            {/* Left Sidebar (Desktop) */}
+            <div className="hidden md:block">
+                <Sidebar />
+            </div>
+
+            {/* Main content */}
+            <div className="flex-1 max-w-2xl mx-auto w-full pb-24 md:pb-0 border-r border-stone-200 min-h-screen relative bg-white">
             {/* Toast Notification */}
             <AnimatePresence>
                 {showToast && (
@@ -263,6 +271,7 @@ export default function PostDetail({ params }: { params: { id: string } }) {
                         Buy Now
                     </button>
                 </div>
+            </div>
             </div>
 
             {/* Mobile Bottom Nav */}
