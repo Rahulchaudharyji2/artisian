@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import mongoose from 'mongoose';
 import Artisan from '@/models/Artisan';
 import connectDB from '@/lib/db';
 
@@ -28,26 +29,25 @@ export async function POST(
             return NextResponse.json({ error: 'User not found' }, { status: 404 });
         }
 
-        const mongoose = (await import('mongoose')).default;
         const targetId = new mongoose.Types.ObjectId(params.id);
         const followerObjId = new mongoose.Types.ObjectId(followerId);
 
-        const isFollowing = target.followers.some(
-            (id: mongoose.Types.ObjectId) => id.toString() === followerId
+        const isFollowing = (target.followers as mongoose.Types.ObjectId[]).some(
+            (id) => id.toString() === followerId
         );
 
         if (isFollowing) {
             // Unfollow
-            target.followers = target.followers.filter(
-                (id: mongoose.Types.ObjectId) => id.toString() !== followerId
+            target.followers = (target.followers as mongoose.Types.ObjectId[]).filter(
+                (id) => id.toString() !== followerId
             );
-            follower.following = follower.following.filter(
-                (id: mongoose.Types.ObjectId) => id.toString() !== params.id
+            follower.following = (follower.following as mongoose.Types.ObjectId[]).filter(
+                (id) => id.toString() !== params.id
             );
         } else {
             // Follow
-            target.followers.push(followerObjId);
-            follower.following.push(targetId);
+            (target.followers as mongoose.Types.ObjectId[]).push(followerObjId);
+            (follower.following as mongoose.Types.ObjectId[]).push(targetId);
         }
 
         await Promise.all([target.save(), follower.save()]);
