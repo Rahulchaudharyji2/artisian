@@ -27,7 +27,7 @@ function sanitizeJson(text: string): string {
     
     // Replace literal newlines with space or \n inside quoted values
     // This regex looks for text between quotes and replaces newlines
-    sanitized = sanitized.replace(/"([^"\\]*(?:\\.[^"\\]*)*)"/gs, (match) => {
+    sanitized = sanitized.replace(/"([^"\\]*(?:\\.[^"\\]*)*)"/g, (match) => {
         return match.replace(/\n/g, "\\n").replace(/\r/g, "");
     });
 

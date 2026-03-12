@@ -299,7 +299,7 @@ export default function CreatePost() {
 
                                     {/* Main Image Banner */}
                                     <div className="w-full h-48 bg-stone-100 rounded-xl overflow-hidden relative">
-                                        <img src={images[0]} className="w-full h-full object-cover" />
+                                        <img src={images[0]} alt="Post preview" className="w-full h-full object-cover" />
                                         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-4">
                                             <div className="flex gap-2 text-white text-xs font-bold drop-shadow-md">
                                                 <span className="bg-black/40 backdrop-blur-md px-2 py-1 rounded-md">{aiData.detectedCraft}</span>
