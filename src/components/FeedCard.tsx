@@ -1,13 +1,15 @@
 "use client";
 
-import { Heart, MessageCircle, Send, ShoppingBag, Sparkles, Check } from 'lucide-react';
+import { Heart, MessageCircle, Send, ShoppingBag, Sparkles, Check, UserPlus, UserCheck } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
-import { useState } from 'react';
+import { useAuth } from '@/context/AuthContext';
+import { useState, useCallback } from 'react';
 
 interface FeedCardProps {
     postId: string;
+    artisanId?: string;
     artisanName: string;
     location: string;
     avatarUrl: string;
@@ -20,10 +22,16 @@ interface FeedCardProps {
     craftName?: string;
 }
 
-export default function FeedCard({ postId, artisanName, location, avatarUrl, mediaUrl, caption, likes, comments, price, title, craftName }: FeedCardProps) {
+export default function FeedCard({
+    postId, artisanId, artisanName, location, avatarUrl, mediaUrl,
+    caption, likes, comments, price, title, craftName
+}: FeedCardProps) {
     const router = useRouter();
     const { addToCart, isInCart } = useCart();
+    const { user } = useAuth();
     const [justAdded, setJustAdded] = useState(false);
+    const [isFollowing, setIsFollowing] = useState(false);
+    const [followLoading, setFollowLoading] = useState(false);
     const alreadyInCart = isInCart(postId);
 
     const handleAddToCart = (e: React.MouseEvent) => {
@@ -40,7 +48,28 @@ export default function FeedCard({ postId, artisanName, location, avatarUrl, med
         setTimeout(() => setJustAdded(false), 2000);
     };
 
+    const handleFollow = useCallback(async (e: React.MouseEvent) => {
+        e.stopPropagation();
+        if (!user) { router.push('/auth'); return; }
+        if (!artisanId) return;
+        setFollowLoading(true);
+        try {
+            const res = await fetch(`/api/artisans/${artisanId}/follow`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ followerId: user._id }),
+            });
+            const data = await res.json();
+            if (res.ok) setIsFollowing(data.following);
+        } catch { /* silent */ }
+        finally { setFollowLoading(false); }
+    }, [artisanId, user, router]);
+
     const goToDetail = () => router.push(`/post/${postId}`);
+    const goToArtisan = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        if (artisanId) router.push(`/artisan/${artisanId}`);
+    };
 
     return (
         <motion.div
@@ -49,29 +78,41 @@ export default function FeedCard({ postId, artisanName, location, avatarUrl, med
         >
             {/* Header */}
             <div className="flex items-center justify-between p-5 md:p-6">
-                <div className="flex items-center gap-4 cursor-pointer" onClick={goToDetail}>
+                <div className="flex items-center gap-4 cursor-pointer" onClick={goToArtisan}>
                     <div className="relative">
                         <div className="absolute inset-0 bg-gradient-to-tr from-qala-gold to-qala-saffron rounded-full blur-[6px] opacity-40 group-hover:opacity-80 transition-opacity duration-500"></div>
                         <img src={avatarUrl} alt={artisanName} className="relative w-12 h-12 rounded-full object-cover border-2 border-white shadow-sm" />
                     </div>
                     <div>
                         <h3 className="font-bold text-base text-stone-900 leading-tight group-hover:text-qala-gold transition-colors">{artisanName}</h3>
-                        <p className="text-xs font-medium text-stone-500 flex items-center gap-1 mt-0.5">
-                            {location}
-                        </p>
+                        <p className="text-xs font-medium text-stone-500 mt-0.5">{location}</p>
                     </div>
                 </div>
-                <button className="flex items-center gap-1.5 px-4 py-2 bg-stone-50 hover:bg-stone-100 text-stone-900 font-bold text-xs uppercase tracking-widest rounded-full transition-colors border border-stone-200">
-                    <Sparkles className="w-3 h-3 text-qala-gold" />
-                    Follow
-                </button>
+                <motion.button
+                    whileTap={{ scale: 0.92 }}
+                    onClick={handleFollow}
+                    disabled={followLoading || !artisanId}
+                    className={`flex items-center gap-1.5 px-4 py-2 text-xs font-bold uppercase tracking-widest rounded-full transition-all border ${
+                        isFollowing
+                            ? 'bg-qala-gold/10 text-qala-gold border-qala-gold/30'
+                            : 'bg-stone-50 text-stone-900 border-stone-200 hover:bg-stone-100'
+                    } ${followLoading ? 'opacity-60 cursor-not-allowed' : ''}`}
+                >
+                    {followLoading ? (
+                        <div className="w-3 h-3 border-1.5 border-current/30 border-t-current rounded-full animate-spin" />
+                    ) : isFollowing ? (
+                        <UserCheck size={12} />
+                    ) : (
+                        <UserPlus size={12} />
+                    )}
+                    {isFollowing ? 'Following' : 'Follow'}
+                </motion.button>
             </div>
 
             {/* Media — clickable to detail page */}
             <div className="w-full aspect-square bg-stone-100 overflow-hidden relative cursor-pointer" onClick={goToDetail}>
                 <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-10 pointer-events-none"></div>
                 <img src={mediaUrl} alt={title || "Product"} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out" />
-                {/* Price badge */}
                 {price && price > 0 && (
                     <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-md text-stone-900 font-black text-xs px-3 py-1.5 rounded-full shadow-lg border border-stone-100 z-20">
                         ₹{price.toLocaleString('en-IN')}
@@ -89,7 +130,7 @@ export default function FeedCard({ postId, artisanName, location, avatarUrl, med
                         <button className="text-stone-400 hover:text-stone-900 hover:scale-110 active:scale-95 transition-all">
                             <MessageCircle size={28} strokeWidth={1.5} />
                         </button>
-                        <button className="text-stone-400 hover:text-stone-900 hover:scale-110 active:scale-95 transition-all -mt-1">
+                        <button className="text-stone-400 hover:text-stone-900 hover:scale-110 active:scale-95 transition-all">
                             <Send size={28} strokeWidth={1.5} />
                         </button>
                     </div>
@@ -118,7 +159,7 @@ export default function FeedCard({ postId, artisanName, location, avatarUrl, med
                 <div className="font-bold text-sm text-stone-900 mb-3">{likes} likes</div>
 
                 <p className="text-sm text-stone-700 whitespace-pre-line leading-relaxed">
-                    <span className="font-black text-stone-900 mr-2 cursor-pointer hover:underline" onClick={goToDetail}>{artisanName}</span>
+                    <span className="font-black text-stone-900 mr-2 cursor-pointer hover:underline" onClick={goToArtisan}>{artisanName}</span>
                     <span className="font-light">{caption}</span>
                 </p>
 
