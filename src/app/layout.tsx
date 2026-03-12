@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
 import { AuthProvider } from '@/context/AuthContext';
+import { CartProvider } from '@/context/CartContext';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -19,9 +20,11 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${inter.className} min-h-screen bg-karigar-bg text-stone-900 font-sans`}>
         <AuthProvider>
-          <main className="w-full min-h-screen flex flex-col relative">
-            {children}
-          </main>
+          <CartProvider>
+            <main className="w-full min-h-screen flex flex-col relative">
+              {children}
+            </main>
+          </CartProvider>
         </AuthProvider>
       </body>
     </html>

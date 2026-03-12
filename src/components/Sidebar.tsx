@@ -1,18 +1,21 @@
 "use client";
 
-import { User, Compass as DiscoverIcon, PlusSquare, Sparkles, LogOut } from 'lucide-react';
+import { User, Compass as DiscoverIcon, PlusSquare, Sparkles, LogOut, ShoppingBag } from 'lucide-react';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '../context/AuthContext';
+import { useCart } from '../context/CartContext';
 
 export default function Sidebar() {
     const pathname = usePathname();
     const router = useRouter();
     const { user, logout } = useAuth();
+    const { cartCount } = useCart();
 
     const navItems = [
-        { path: '/discover', icon: DiscoverIcon, label: 'Discover' },
-        ...(user?.role === 'artisan' ? [{ path: '/ai-tools', icon: Sparkles, label: 'AI Photo Lab' }] : []),
-        { path: '/profile', icon: User, label: 'My Profile' },
+        { path: '/discover', icon: DiscoverIcon, label: 'Discover', badge: 0 },
+        ...(user?.role === 'artisan' ? [{ path: '/ai-tools', icon: Sparkles, label: 'AI Photo Lab', badge: 0 }] : []),
+        { path: '/cart', icon: ShoppingBag, label: 'My Cart', badge: cartCount },
+        { path: '/profile', icon: User, label: 'My Profile', badge: 0 },
     ];
 
     return (
@@ -41,12 +44,22 @@ export default function Sidebar() {
                                 : 'text-stone-500 hover:bg-stone-100 hover:text-stone-900 font-medium border border-transparent'
                                 }`}
                         >
-                            <item.icon
-                                size={20}
-                                className={`transition-colors ${isActive ? 'text-qala-gold' : 'group-hover:text-stone-700'}`}
-                                strokeWidth={isActive ? 2.5 : 2}
-                            />
+                            <div className="relative">
+                                <item.icon
+                                    size={20}
+                                    className={`transition-colors ${isActive ? 'text-qala-gold' : 'group-hover:text-stone-700'}`}
+                                    strokeWidth={isActive ? 2.5 : 2}
+                                />
+                                {item.badge > 0 && (
+                                    <span className="absolute -top-2 -right-2 min-w-[16px] h-4 bg-qala-gold text-white text-[9px] font-black rounded-full flex items-center justify-center px-0.5">
+                                        {item.badge > 9 ? '9+' : item.badge}
+                                    </span>
+                                )}
+                            </div>
                             <span className="text-xs font-bold tracking-widest uppercase">{item.label}</span>
+                            {item.badge > 0 && (
+                                <span className="ml-auto bg-qala-gold/10 text-qala-gold text-[10px] font-black px-2 py-0.5 rounded-full border border-qala-gold/20">{item.badge}</span>
+                            )}
                         </button>
                     );
                 })}

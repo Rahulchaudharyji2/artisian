@@ -31,9 +31,12 @@ export default function Discover() {
                         location: post.artisanId?.region || "India",
                         avatarUrl: post.artisanId?.image || "https://images.unsplash.com/photo-1544928147-79a2dbc1f389?q=80&w=100&auto=format&fit=crop",
                         mediaUrl: (post.images && post.images.length > 0) ? post.images[0] : "https://images.unsplash.com/photo-1606760227091-3dd870d97f1d?q=80&w=600&auto=format&fit=crop",
-                        caption: post.title ? `${post.title}: ${post.description}` : post.description,
+                        caption: post.description || post.title || '',
                         likes: post.likes?.toLocaleString() || "0",
-                        comments: "0"
+                        comments: "0",
+                        price: post.price || 0,
+                        title: post.title || '',
+                        craftName: post.craftName || 'Handmade Craft',
                     }));
                     setFeedPosts(formattedPosts);
                 }
@@ -181,6 +184,7 @@ export default function Discover() {
                             >
                                 <FeedCard
                                     key={post.id}
+                                    postId={post.id}
                                     artisanName={post.artisanName}
                                     location={post.location}
                                     avatarUrl={post.avatarUrl}
@@ -188,6 +192,9 @@ export default function Discover() {
                                     caption={post.caption}
                                     likes={post.likes}
                                     comments={post.comments}
+                                    price={post.price}
+                                    title={post.title}
+                                    craftName={post.craftName}
                                 />
                             </motion.div>
                         ))}

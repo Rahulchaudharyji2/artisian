@@ -4,24 +4,39 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Home, PlaySquare, PlusSquare, ShoppingBag, User } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useCart } from '../context/CartContext';
 
 export default function BottomNav() {
     const { user } = useAuth();
+    const { cartCount } = useCart();
     const pathname = usePathname();
 
     return (
         <div className="fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-lg border-t border-stone-200/50 flex justify-around items-center py-4 px-6 z-50 md:hidden shadow-[0_-4px_20px_rgba(0,0,0,0.02)] pb-6">
             <NavItem href="/discover" icon={<Home size={24} />} isActive={pathname === '/discover'} />
-            
+
             {user?.role === 'artisan' && (
                 <NavItem href="#" icon={<PlaySquare size={24} />} isActive={pathname === '/reels'} />
             )}
-            
+
             {user?.role === 'artisan' && (
                 <NavItem href="/create-post" icon={<PlusSquare size={24} />} isUpload />
             )}
-            
-            <NavItem href="#" icon={<ShoppingBag size={24} />} isActive={pathname === '/cart'} />
+
+            <NavItem
+                href="/cart"
+                icon={
+                    <div className="relative">
+                        <ShoppingBag size={24} />
+                        {cartCount > 0 && (
+                            <span className="absolute -top-2 -right-2 w-4.5 h-4.5 min-w-[18px] min-h-[18px] bg-qala-gold text-white text-[10px] font-black rounded-full flex items-center justify-center leading-none px-0.5">
+                                {cartCount > 9 ? '9+' : cartCount}
+                            </span>
+                        )}
+                    </div>
+                }
+                isActive={pathname === '/cart'}
+            />
             <NavItem href="/profile" icon={<User size={24} />} isActive={pathname === '/profile'} />
         </div>
     );
