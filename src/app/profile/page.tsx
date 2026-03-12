@@ -33,43 +33,45 @@ export default function Profile() {
 
         const fetchProfileData = async () => {
             try {
-                // Determine the correct endpoint based on role
-                const endpoint = user.role === 'artisan' 
-                    ? `/api/artisans/${user._id}`
-                    : `/api/users/${user._id}`; // assuming we have a generic users endpoint or just use localStorage data for shoppers
-
-                const response = await fetch(endpoint);
-                const data = await response.json();
-                
-                if (response.ok && data) {
-                    setProfileData(data);
-                    // Initialize edit state
-                    setEditName(data.name || '');
-                    setEditBio(data.story || data.bio || '');
-                    setEditRegion(data.region || '');
-                    setEditArt(data.art || '');
-                    setEditImage(data.image || null);
-                } else if (!response.ok && user.role === 'user') {
-                    // Fallback for shopper users if there is no distinct backend table yet
-                    setProfileData(user);
-                    setEditName(user.name || '');
-                }
-
-                // Fetch posts if artisan
                 if (user.role === 'artisan') {
+                    // Fetch full artisan data from API
+                    const response = await fetch(`/api/artisans/${user._id}`);
+                    const data = await response.json();
+                    
+                    if (response.ok && data) {
+                        setProfileData(data);
+                        setEditName(data.name || '');
+                        setEditBio(data.story || data.bio || '');
+                        setEditRegion(data.region || '');
+                        setEditArt(data.art || '');
+                        setEditImage(data.image || null);
+                    } else {
+                        // Fallback to context user data
+                        setProfileData(user);
+                        setEditName(user.name || '');
+                    }
+
+                    // Fetch artisan posts
                     const postsResponse = await fetch(`/api/posts/artisan/${user._id}`);
                     const postsData = await postsResponse.json();
                     if (postsResponse.ok && Array.isArray(postsData)) {
-                         setPosts(postsData.map((post: any) => ({
+                        setPosts(postsData.map((post: any) => ({
                             id: post._id,
                             mediaUrl: (post.images && post.images.length > 0) ? post.images[0] : "https://images.unsplash.com/photo-1606760227091-3dd870d97f1d?q=80&w=600&auto=format&fit=crop",
                             caption: post.title ? `${post.title}: ${post.description}` : post.description,
                             likes: post.likes || 0,
                         })));
                     }
+                } else {
+                    // Shopper: no separate API — use context user data directly
+                    setProfileData(user);
+                    setEditName(user.name || '');
                 }
             } catch (error) {
                 console.error("Error fetching profile:", error);
+                // Fallback: always show something using context data
+                setProfileData(user);
+                setEditName(user.name || '');
             } finally {
                 setIsLoading(false);
             }
