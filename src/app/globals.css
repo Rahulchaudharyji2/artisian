@@ -38,6 +38,14 @@ body {
     background-color: #e5e5e5;
     border-radius: 20px;
   }
+
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 /* Custom premium styles */

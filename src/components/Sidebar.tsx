@@ -1,6 +1,6 @@
 "use client";
 
-import { User, Compass as DiscoverIcon, PlusSquare, Sparkles, LogOut, ShoppingBag } from 'lucide-react';
+import { User, Compass as DiscoverIcon, PlusSquare, Sparkles, LogOut, ShoppingBag, Clapperboard } from 'lucide-react';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
@@ -13,12 +13,13 @@ export default function Sidebar() {
 
     const navItems = [
         { path: '/discover', icon: DiscoverIcon, label: 'Discover', badge: 0 },
-        {
-            path: user?.role === 'artisan' ? '/create-post' : '/ai-tools',
-            icon: Sparkles,
-            label: user?.role === 'artisan' ? 'AI Studio' : 'Qala Studio',
-            badge: 0
-        },
+        { path: '/reels', icon: Clapperboard, label: 'Qala Reels', badge: 0 },
+        ...(user?.role === 'artisan' ? [{ 
+            path: '/create-post', 
+            icon: Sparkles, 
+            label: 'AI Studio', 
+            badge: 0 
+        }] : []),
         { path: '/cart', icon: ShoppingBag, label: 'My Cart', badge: cartCount },
         { path: '/profile', icon: User, label: 'My Profile', badge: 0 },
     ];

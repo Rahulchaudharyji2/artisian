@@ -11,25 +11,23 @@ export default function BottomNav() {
     const { cartCount } = useCart();
     const pathname = usePathname();
 
-    // Studio route — artisan goes to create-post, shopper goes to ai-tools
-    const studioHref = user?.role === 'artisan' ? '/create-post' : '/ai-tools';
-
     return (
         <div className="fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-lg border-t border-stone-200/50 flex justify-around items-center py-2 px-4 z-50 md:hidden shadow-[0_-4px_20px_rgba(0,0,0,0.04)] pb-6">
             <NavItem href="/discover" icon={<Home size={22} />} isActive={pathname === '/discover'} label="Home" />
 
-            {user?.role === 'artisan' && (
-                <NavItem href="#" icon={<Clapperboard size={22} />} isActive={false} label="Reels" />
-            )}
+            {/* Reels — Universal Access */}
+            <NavItem href="/reels" icon={<Clapperboard size={22} />} isActive={pathname === '/reels'} label="Reels" />
 
-            {/* Studio — shown to EVERYONE */}
-            <NavItem
-                href={studioHref}
-                icon={<Sparkles size={22} />}
-                isActive={pathname === '/create-post' || pathname === '/ai-tools'}
-                label="Studio"
-                isUpload
-            />
+            {/* Studio — Artisan ONLY */}
+            {user?.role === 'artisan' && (
+                <NavItem
+                    href="/create-post"
+                    icon={<Sparkles size={22} />}
+                    isActive={pathname === '/create-post' || pathname === '/ai-tools'}
+                    label="Studio"
+                    isUpload
+                />
+            )}
 
             <NavItem
                 href="/cart"
@@ -66,10 +64,10 @@ function NavItem({
                 href={href}
                 className="flex flex-col items-center gap-0.5 group"
             >
-                <div className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all shadow-lg -mt-5 border-4 border-white ${isActive ? 'bg-qala-gold text-white shadow-qala-gold/30' : 'bg-stone-900 text-qala-gold shadow-stone-900/20 group-hover:bg-black'}`}>
+                <div className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all shadow-lg -mt-5 border-4 border-white ${isActive ? 'bg-stone-900 text-qala-gold' : 'bg-stone-900 text-white shadow-stone-900/20 group-hover:bg-black'}`}>
                     {icon}
                 </div>
-                <span className={`text-[9px] font-bold uppercase tracking-wider mt-0.5 ${isActive ? 'text-qala-gold' : 'text-stone-400'}`}>{label}</span>
+                <span className={`text-[9px] font-bold uppercase tracking-wider mt-0.5 ${isActive ? 'text-stone-900' : 'text-stone-400'}`}>{label}</span>
             </Link>
         );
     }
