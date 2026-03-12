@@ -1,36 +1,36 @@
-# Dependencies
-node_modules/
-.npm/
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
-# Build
-dist/
-build/
-.next/
-out/
+# dependencies
+/node_modules
+/.pnp
+.pnp.js
+.yarn/install-state.gz
 
-# Environment
-.env
-.env.local
-.env.*.local
+# testing
+/coverage
 
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
+# next.js
+/.next/
+/out/
 
-# OS
+# production
+/build
+
+# misc
 .DS_Store
-Thumbs.db
+*.pem
 
-# Logs
+# debug
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# Qala specific
-backend/node_modules/
-frontend/node_modules/
-frontend/.next/
-frontend/dist/
-backend/dist/
+# local env files
+.env*.local
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
