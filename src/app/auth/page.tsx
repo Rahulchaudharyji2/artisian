@@ -134,8 +134,8 @@ export default function Auth() {
                     role: data.role || role
                 });
                 
-                // Redirect to Profile or Discover based on role
-                router.push(role === 'artisan' ? '/profile' : '/discover');
+                // Redirect to Discover page after signup
+                router.push('/discover');
             }
         } catch (err) {
             console.error("Auth error:", err);

@@ -145,7 +145,7 @@ export default function Profile() {
                 {/* Header Navbar */}
                 <div className="sticky top-0 bg-white/80 backdrop-blur-xl z-40 px-6 py-4 border-b border-stone-100 flex justify-between items-center transition-all">
                     <div className="flex items-center gap-4">
-                        <button onClick={() => router.back()} className="p-2 -ml-2 text-stone-900 hover:bg-stone-100 rounded-full transition-colors">
+                        <button onClick={() => router.push('/discover')} className="p-2 -ml-2 text-stone-900 hover:bg-stone-100 rounded-full transition-colors">
                             <ArrowLeft size={24} />
                         </button>
                         <h1 className="text-xl font-bold text-stone-900 tracking-tight">Profile</h1>
