@@ -5,20 +5,23 @@ import {
     Wand2, BookOpen, IndianRupee, Megaphone, 
     ArrowLeft, Upload, Sparkles, Download, 
     Instagram, MessageCircle, PlaySquare, 
-    TrendingUp, Info, Check, Loader2, ImagePlus, X as XIcon
+    TrendingUp, Info, Check, Loader2, ImagePlus, X as XIcon,
+    History, Gift, Paintbrush, Compass, Plus
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Sidebar from '@/components/Sidebar';
 import BottomNav from '@/components/BottomNav';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '@/context/AuthContext';
 
-type ToolType = 'clean' | 'weave' | 'sense' | 'boost' | null;
+type ToolType = 'clean' | 'weave' | 'sense' | 'boost' | 'heritage' | 'gift' | 'style' | null;
 
 export default function AITools() {
     const [activeTool, setActiveTool] = useState<ToolType>(null);
     const router = useRouter();
+    const { user } = useAuth();
 
-    const tools = [
+    const artisanTools = [
         {
             id: 'clean' as const,
             name: 'CraftClean AI',
@@ -53,13 +56,43 @@ export default function AITools() {
         }
     ];
 
+    const shopperTools = [
+        {
+            id: 'heritage' as const,
+            name: 'Heritage Explorer',
+            desc: 'Discover the hidden history of any craft',
+            icon: History,
+            color: 'bg-orange-500',
+            bg: 'bg-orange-50'
+        },
+        {
+            id: 'style' as const,
+            name: 'Style Matcher',
+            desc: 'AI matching crafts to your home aesthetic',
+            icon: Paintbrush,
+            color: 'bg-indigo-500',
+            bg: 'bg-indigo-50'
+        },
+        {
+            id: 'gift' as const,
+            name: 'Smart Gift Finder',
+            desc: 'Find the perfect authentic gift',
+            icon: Gift,
+            color: 'bg-rose-500',
+            bg: 'bg-rose-50'
+        }
+    ];
+
+    const currentTools = user?.role === 'artisan' ? artisanTools : shopperTools;
+
     return (
         <div className="flex w-full min-h-screen bg-stone-50 selection:bg-qala-gold/30">
-            <div className="hidden md:block">
+            {/* Desktop Sidebar */}
+            <div className="hidden md:block w-64 shrink-0">
                 <Sidebar />
             </div>
 
-            <main className="flex-1 max-w-4xl mx-auto w-full p-6 pb-24 md:pb-12">
+            <main className="flex-1 max-w-5xl mx-auto w-full p-4 md:p-8 pb-24 md:pb-12">
                 <AnimatePresence mode="wait">
                     {!activeTool ? (
                         <motion.div 
@@ -69,42 +102,70 @@ export default function AITools() {
                             exit={{ opacity: 0, scale: 0.95 }}
                             className="pt-6"
                         >
-                            <div className="mb-10 text-center md:text-left">
-                                <h1 className="text-4xl font-black text-stone-900 tracking-tight mb-2">
-                                    AI Artisan Tools <Sparkles className="inline-block text-qala-gold ml-2" />
-                                </h1>
-                                <p className="text-stone-500 font-medium">Simple tools to help you sell your crafts better.</p>
+                            <div className="mb-10 text-center md:text-left flex flex-col md:flex-row md:items-end justify-between gap-6">
+                                <div>
+                                    <h1 className="text-4xl md:text-5xl font-black text-stone-900 tracking-tight mb-2">
+                                        {user?.role === 'artisan' ? 'Artisan AI Studio' : 'Qala Discovery Studio'} 
+                                        <Sparkles className="inline-block text-qala-gold ml-2 animate-pulse" />
+                                    </h1>
+                                    <p className="text-stone-500 font-medium text-lg">
+                                        {user?.role === 'artisan' 
+                                            ? 'Professional tools to scale your heritage business.' 
+                                            : 'Explore the depths of Indian craftsmanship with AI.'}
+                                    </p>
+                                </div>
+                                
+                                {user?.role === 'artisan' && (
+                                    <button 
+                                        onClick={() => router.push('/create-post')}
+                                        className="bg-qala-gold text-white px-6 py-3 rounded-2xl font-black shadow-lg shadow-qala-gold/20 hover:scale-105 transition-all flex items-center justify-center gap-2"
+                                    >
+                                        <Plus size={20} /> NEW POST
+                                    </button>
+                                )}
                             </div>
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                {tools.map((tool) => (
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6">
+                                {currentTools.map((tool) => (
                                     <button
                                         key={tool.id}
                                         onClick={() => setActiveTool(tool.id)}
-                                        className={`group relative overflow-hidden p-6 rounded-[32px] border border-stone-100 bg-white shadow-sm hover:shadow-2xl hover:-translate-y-1 transition-all text-left flex flex-col items-start gap-3`}
+                                        className={`group relative overflow-hidden p-8 rounded-[40px] border border-stone-100 bg-white shadow-sm hover:shadow-2xl hover:-translate-y-1 transition-all text-left flex flex-col items-start gap-4 min-h-[200px]`}
                                     >
-                                        <div className={`p-3.5 rounded-2xl ${tool.color} text-white shadow-lg group-hover:scale-110 transition-all duration-500`}>
-                                            <tool.icon size={28} />
+                                        <div className={`p-4 rounded-[20px] ${tool.color} text-white shadow-lg group-hover:scale-110 transition-all duration-500`}>
+                                            <tool.icon size={32} />
                                         </div>
                                         <div>
-                                            <h3 className="text-xl font-black text-stone-900 mb-0.5 tracking-tight">{tool.name}</h3>
-                                            <p className="text-stone-400 text-sm font-medium leading-relaxed">{tool.desc}</p>
+                                            <h3 className="text-2xl font-black text-stone-900 mb-1 tracking-tight">{tool.name}</h3>
+                                            <p className="text-stone-400 font-medium leading-relaxed max-w-[80%] text-sm">{tool.desc}</p>
                                         </div>
-                                        <div className={`absolute -right-2 -bottom-2 opacity-[0.03] text-stone-900 group-hover:scale-110 transition-all duration-700`}>
-                                            <tool.icon size={100} />
+                                        <div className={`absolute -right-4 -bottom-4 opacity-[0.05] text-stone-900 group-hover:scale-110 transition-all duration-700`}>
+                                            <tool.icon size={120} />
+                                        </div>
+                                        <div className="absolute top-8 right-8 text-stone-200 group-hover:text-stone-400 transition-colors">
+                                            <Compass size={24} />
                                         </div>
                                     </button>
                                 ))}
                             </div>
                             
-                            <div className="mt-12 text-center">
-                                <button 
-                                    onClick={() => router.push('/create-post')}
-                                    className="bg-stone-900 text-white px-8 py-4 rounded-full font-bold shadow-lg hover:bg-black transition-colors"
-                                >
-                                    Go to Qala AI Creator
-                                </button>
-                            </div>
+                            {!activeTool && user?.role !== 'artisan' && (
+                                <div className="mt-16 p-8 rounded-[40px] bg-stone-900 text-white overflow-hidden relative">
+                                    <div className="relative z-10 max-w-lg">
+                                        <h3 className="text-2xl font-black mb-3">Are you an Artisan?</h3>
+                                        <p className="text-stone-400 font-medium mb-6">Unlock professional marketing tools, smart pricing, and growth analytics by switching to an Artisan profile.</p>
+                                        <button 
+                                            onClick={() => router.push('/profile')}
+                                            className="bg-qala-gold text-white px-8 py-4 rounded-2xl font-black shadow-lg hover:bg-qala-gold/90 transition-all"
+                                        >
+                                            Switch to Artisan Role
+                                        </button>
+                                    </div>
+                                    <div className="absolute right-[-10%] top-[-20%] opacity-10">
+                                        <Sparkles size={300} />
+                                    </div>
+                                </div>
+                            )}
                         </motion.div>
                     ) : (
                         <motion.div 
@@ -112,28 +173,31 @@ export default function AITools() {
                             initial={{ opacity: 0, x: 20 }}
                             animate={{ opacity: 1, x: 0 }}
                             exit={{ opacity: 0, x: -20 }}
-                            className="bg-white rounded-[40px] shadow-xl border border-stone-100 mt-6"
+                            className="bg-white rounded-[40px] shadow-2xl border border-stone-100 mt-6 overflow-hidden"
                         >
                             {/* Tool Header */}
-                            <div className="p-6 md:p-8 flex items-center justify-between border-b border-stone-50">
+                            <div className="p-6 md:p-8 flex items-center justify-between border-b border-stone-50 bg-stone-50/50">
                                 <button 
                                     onClick={() => setActiveTool(null)}
-                                    className="p-3 bg-stone-100 rounded-2xl hover:bg-stone-200 transition-colors"
+                                    className="p-3 bg-white shadow-sm rounded-2xl hover:bg-stone-50 transition-colors border border-stone-100"
                                 >
                                     <ArrowLeft size={24} />
                                 </button>
-                                <h2 className="text-xl font-black text-stone-900">
-                                    {tools.find(t => t.id === activeTool)?.name}
+                                <h2 className="text-2xl font-black text-stone-900 tracking-tight">
+                                    {[...artisanTools, ...shopperTools].find(t => t.id === activeTool)?.name}
                                 </h2>
                                 <div className="w-12 h-12" /> {/* Spacer */}
                             </div>
 
-                            <div className="flex flex-col h-[70vh] md:h-auto pb-10">
-                                <div className="flex-1 overflow-y-auto p-6 md:p-10 custom-scrollbar">
+                            <div className="flex flex-col min-h-[60vh] pb-10">
+                                <div className="flex-1 p-6 md:p-10">
                                     {activeTool === 'clean' && <CraftCleanTool />}
                                     {activeTool === 'weave' && <StoryWeaveTool />}
                                     {activeTool === 'sense' && <PriceSenseTool />}
                                     {activeTool === 'boost' && <CraftBoostTool />}
+                                    {activeTool === 'heritage' && <PlaceholderTool name="Heritage Explorer" icon={History} />}
+                                    {activeTool === 'style' && <PlaceholderTool name="Style Matcher" icon={Paintbrush} />}
+                                    {activeTool === 'gift' && <PlaceholderTool name="Gift Finder" icon={Gift} />}
                                 </div>
                             </div>
                         </motion.div>
@@ -147,6 +211,24 @@ export default function AITools() {
         </div>
     );
 }
+
+function PlaceholderTool({ name, icon: Icon }: { name: string, icon: any }) {
+    return (
+        <div className="flex flex-col items-center justify-center h-full py-20 text-center">
+            <div className="w-32 h-32 bg-stone-50 rounded-[40px] flex items-center justify-center mb-8 border border-stone-100 shadow-inner">
+                <Icon size={64} className="text-stone-300" />
+            </div>
+            <h3 className="text-3xl font-black text-stone-900 mb-4 tracking-tight">{name}</h3>
+            <p className="text-stone-500 max-w-sm mx-auto font-medium text-lg leading-relaxed">
+                This feature is launching soon! Our AI is busy learning about centuries of craftsmanship to bring you the best experience.
+            </p>
+            <button className="mt-10 px-8 py-4 bg-stone-900 text-white rounded-2xl font-black shadow-xl hover:bg-black transition-all">
+                Notify Me When Ready
+            </button>
+        </div>
+    );
+}
+
 
 // --- TOOL COMPONENTS ---
 
